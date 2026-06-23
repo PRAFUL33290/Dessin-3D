@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <g fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Bubble Cockpit -->
+    <path d="M 30 50 Q 50 18 70 50" />
+    <path d="M 33 46 Q 50 24 67 46" stroke-dasharray="2 3" stroke-width="1.5" />
+    
+    <!-- Steering wheel inside -->
+    <path d="M 52 50 L 56 43" />
+    <circle cx="56" cy="41" r="5" />
+    
+    <!-- Headrest / Seats -->
+    <path d="M 38 50 L 38 42 Q 41 38 44 42 L 44 50" />
+    
+    <!-- Car Body -->
+    <path d="M 15 50 Q 8 50 10 58 L 14 66 Q 25 72 50 72 Q 75 72 86 66 L 90 58 Q 92 50 85 50 Z" />
+    
+    <!-- Front Light (Left) and Back Light (Right) -->
+    <path d="M 11 58 Q 8 60 11 62" />
+    <path d="M 89 58 Q 92 60 89 62" />
+    
+    <!-- Left Wing -->
+    <path d="M 15 55 L 2 57 L 14 62 Z" />
+    
+    <!-- Right Wing -->
+    <path d="M 85 55 L 98 57 L 86 62 Z" />
+    
+    <!-- Jet Thrusters underneath -->
+    <!-- Left Engine -->
+    <path d="M 24 70 C 24 77, 34 77, 34 70" />
+    <path d="M 27 75 L 25 88" />
+    <path d="M 29 75 L 29 90" />
+    <path d="M 31 75 L 33 87" />
+    
+    <!-- Right Engine -->
+    <path d="M 66 70 C 66 77, 76 77, 76 70" />
+    <path d="M 69 75 L 67 87" />
+    <path d="M 71 75 L 71 90" />
+    <path d="M 73 75 L 75 88" />
+    
+    <!-- Speed/Cloud Details -->
+    <path d="M 45 80 Q 50 83 55 80" stroke-width="1.5" />
+    <path d="M 5 45 Q 12 43 14 47" stroke-width="1.5" />
+    <path d="M 86 45 Q 88 47 95 45" stroke-width="1.5" />
+  </g>
+</svg>

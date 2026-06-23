@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <g fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Antenna on Top -->
+    <path d="M 50 22 L 50 10" stroke-width="2.8" />
+    <circle cx="50" cy="7" r="3" />
+    <path d="M 45 3 Q 50 6 55 3" stroke-width="1" stroke-dasharray="2 2" />
+    
+    <!-- Main Donut Body (Outer Ring) -->
+    <circle cx="50" cy="46" r="24" stroke-width="3" />
+    
+    <!-- Inner Donut Hole -->
+    <circle cx="50" cy="46" r="8" stroke-width="2.5" />
+    
+    <!-- Frosting wavy line inside the donut ring -->
+    <path d="M 28 46 C 28 35, 35 28, 50 28 C 65 28, 72 35, 72 46 C 72 55, 66 60, 58 62 C 54 63, 46 63, 42 62 C 34 60, 28 55, 28 46 Z" stroke-dasharray="3 3" stroke-width="1.2" />
+    
+    <!-- Sprinkles on Frosting (scattered small rectangles/lines) -->
+    <!-- Top Left -->
+    <line x1="33" y1="35" x2="37" y2="33" stroke-width="2" />
+    <!-- Top Right -->
+    <line x1="63" y1="33" x2="67" y2="35" stroke-width="2" />
+    <!-- Center Left -->
+    <line x1="30" y1="48" x2="34" y2="48" stroke-width="2" />
+    <!-- Center Right -->
+    <line x1="66" y1="48" x2="70" y2="48" stroke-width="2" />
+    <!-- Bottom Left -->
+    <line x1="36" y1="56" x2="39" y2="59" stroke-width="2" />
+    <!-- Bottom Right -->
+    <line x1="61" y1="59" x2="64" y2="56" stroke-width="2" />
+    <!-- Top Center -->
+    <line x1="50" y1="26" x2="50" y2="30" stroke-width="2" />
+    
+    <!-- Eyes on Frosting -->
+    <circle cx="41" cy="37" r="4.5" />
+    <circle cx="41" cy="37" r="1.5" fill="#1e293b" />
+    
+    <circle cx="59" cy="37" r="4.5" />
+    <circle cx="59" cy="37" r="1.5" fill="#1e293b" />
+    
+    <!-- Cute Smile -->
+    <path d="M 46 42 Q 50 45 54 42" />
+    
+    <!-- Robot Arms -->
+    <!-- Left Arm -->
+    <path d="M 26 46 L 14 46 C 10 46, 11 58, 17 58" />
+    <!-- Left Claw -->
+    <path d="M 17 54 C 21 54, 21 62, 17 62" stroke-width="2" />
+    
+    <!-- Right Arm -->
+    <path d="M 74 46 L 86 46 C 90 46, 89 58, 83 58" />
+    <!-- Right Claw -->
+    <path d="M 83 54 C 79 54, 79 62, 83 62" stroke-width="2" />
+    
+    <!-- Robot Legs -->
+    <!-- Left Leg -->
+    <path d="M 38 68 L 38 84 L 30 84" stroke-width="3" />
+    <circle cx="28" cy="84" r="3" fill="#1e293b" /> <!-- Left wheel foot -->
+    
+    <!-- Right Leg -->
+    <path d="M 62 68 L 62 84 L 70 84" stroke-width="3" />
+    <circle cx="72" cy="84" r="3" fill="#1e293b" stroke-width="2.5" /> <!-- Right wheel foot -->
+    
+    <!-- Mechanical panels / Bolts -->
+    <circle cx="46" cy="65" r="1" fill="#1e293b" />
+    <circle cx="54" cy="65" r="1" fill="#1e293b" />
+  </g>
+</svg>

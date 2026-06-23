@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le Musée des Créations 3D • Dessin 3D</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding-top: 4rem;
+    }
+
+    .kid-title {
+      letter-spacing: -0.5px;
+      font-weight: 700;
+    }
+
+    .fun-gradient {
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    }
+
+    header {
+      background: #1e2937;
+      padding: 28px 20px 22px;
+      text-align: center;
+    }
+
+    .museum-title {
+      font-size: 2.35rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+
+    .museum-subtitle {
+      color: #94a3b8;
+      font-size: 1.15rem;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 20px 50px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #cbd5e1;
+      font-size: 1.1rem;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+
+    .creation-card {
+      background: #1e2937;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .child-name {
+      background: #334155;
+      padding: 16px 20px;
+      font-size: 1.55rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .child-name::before {
+      content: "👧";
+      font-size: 1.4rem;
+    }
+
+    .model-wrapper {
+      padding: 16px;
+      background: #0f172a;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 320px;
+      background-color: #1e2937;
+      border-radius: 14px;
+      --poster-color: #1e2937;
+    }
+
+    .description {
+      padding: 16px 20px 20px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .description-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #64748b;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 25px 20px;
+      font-size: 0.85rem;
+      color: #64748b;
+      background: #1e2937;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    .back-link:hover {
+      color: #cbd5e1;
+    }
+
+    .add-instruction {
+      margin-top: 50px;
+      background: #1e2937;
+      padding: 18px 20px;
+      border-radius: 14px;
+      font-size: 1rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .add-instruction code {
+      background: #334155;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      model-viewer {
+        height: 260px;
+      }
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+      .museum-title {
+        font-size: 1.75rem;
+      }
+    }
+
+    .drawer-link:hover {
+      background: #f1f5f9;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FIXED NAV - same as main page -->
+  <nav id="main-nav" class="fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-[100] shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <!-- Logo + Title -->
+      <a href="index.html" class="flex items-center gap-x-3">
+        <div class="w-10 h-10 rounded-2xl fun-gradient flex items-center justify-center text-white text-3xl shadow">
+          🎨
+        </div>
+        <div class="kid-title font-extrabold text-2xl md:text-3xl tracking-tighter text-indigo-700">Mon Dessin Devient 3D</div>
+      </a>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center gap-x-3 text-base font-semibold">
+        <a href="index.html" class="px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">Accueil</a>
+        <a href="3D.html" 
+           class="flex items-center gap-x-2 px-5 py-2 bg-slate-900 hover:bg-black transition-colors text-white rounded-2xl text-base font-semibold">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
+          <span>Le Musée 3D</span>
+        </a>
+      </div>
+
+      <!-- Mobile Burger (right side) -->
+      <button id="burger-btn" 
+              class="md:hidden w-10 h-10 flex items-center justify-center text-2xl text-slate-700 hover:text-indigo-600 transition-colors"
+              aria-label="Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE DRAWER (slides from RIGHT to LEFT) - same as main page -->
+  <div id="mobile-drawer" class="hidden md:hidden fixed inset-0 z-[110]">
+    <!-- Backdrop -->
+    <div id="drawer-backdrop" 
+         class="absolute inset-0 bg-black/50 transition-opacity"></div>
+    
+    <!-- Panel - RIGHT SIDE, slides in from right -->
+    <div id="drawer-panel"
+         class="absolute top-0 bottom-0 right-0 w-72 max-w-[80%] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col">
+      
+      <!-- Drawer Header -->
+      <div class="flex items-center justify-between px-5 h-16 border-b">
+        <div class="flex items-center gap-x-3">
+          <div class="w-8 h-8 rounded-xl fun-gradient flex items-center justify-center text-white text-xl">🎨</div>
+          <span class="font-extrabold text-indigo-700">Menu</span>
+        </div>
+        <button id="drawer-close" class="w-9 h-9 flex items-center justify-center text-2xl text-slate-400 hover:text-slate-700">
+          &times;
+        </button>
+      </div>
+
+      <!-- Menu Items -->
+      <div class="flex flex-col py-2 text-lg">
+        <a href="index.html" class="drawer-link px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">Accueil</a>
+        
+        <div class="my-2 border-t"></div>
+        
+        <a href="3D.html" 
+           class="drawer-link mx-4 mt-1 flex items-center justify-center gap-x-2 px-5 py-3 bg-slate-900 hover:bg-black transition-colors text-white rounded-2xl text-base font-semibold">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
+          <span>Le Musée 3D</span>
+        </a>
+      </div>
+
+      <div class="mt-auto p-5 text-xs text-slate-400 border-t">
+        Le Musée des Créations du Futur
+      </div>
+    </div>
+  </div>
+
+  <header style="padding-top: 12px;">
+    <h1 class="museum-title">🌟 Le Musée des Créations du Futur</h1>
+    <p class="museum-subtitle">Les dessins des enfants transformés en 3D</p>
+  </header>
+
+  <div class="container">
+
+    <!-- Navigation is now in the fixed top menu -->
+
+    <div class="intro">
+      <p>Chaque enfant a dessiné sur papier. Voici leurs créations devenues de vrais modèles 3D !</p>
+    </div>
+
+    <!-- La galerie des créations 3D -->
+    <div id="gallery" class="gallery">
+      <!-- Les cartes sont générées automatiquement par le script -->
+    </div>
+
+    <div class="add-instruction">
+      <strong>Pour ajouter une nouvelle création :</strong><br>
+      1. Place le fichier <code>.glb</code> dans le même dossier.<br>
+      2. Ajoute un nouvel objet dans le tableau <code>creations</code> (voir les exemples ci-dessous dans le code).<br>
+      3. Champs : <code>enfant</code> (obligatoire), <code>titre</code> (optionnel), <code>description</code> et <code>glb</code>.
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    Format GLB généré avec Meshy AI • Le Musée des Créations du Futur
+  </footer>
+
+  <script>
+    // =====================================================
+    // LISTE DES CRÉATIONS 3D DES ENFANTS
+    // Ajoute ou modifie les entrées ci-dessous.
+    // =====================================================
+    const creations = [
+      {
+        enfant: "Arthur",
+        titre: "Super-héros du Futur",
+        description: "Un super-héros courageux prêt à sauver le monde avec ses super-pouvoirs.",
+        glb: "3D MODEL/Super-he\u0301ros.glb",
+        poster: "3D MODEL/Super Hero.png"
+      },
+      {
+        enfant: "Léa",
+        titre: "Chat Ailé des Étoiles",
+        description: "Un chat ailé qui vole dans les étoiles et protège les rêves.",
+        glb: "lea-chat.glb"
+      },
+      {
+        enfant: "Noah",
+        titre: "Panda Ninja",
+        description: "Un super-héros panda qui combat les monstres avec des bananes.",
+        glb: "noah-panda.glb"
+      },
+      {
+        enfant: "Mia",
+        titre: "Licorne Pirate",
+        description: "Une licorne pirate sur son bateau volant rempli de bonbons.",
+        glb: "mia-licorne.glb"
+      }
+      // Ajoute les nouvelles créations ici :
+      // {
+      //   enfant: "Prénom de l'enfant",
+      //   titre: "Nom de sa création (optionnel)",
+      //   description: "Une brève description de son dessin.",
+      //   glb: "nom-du-fichier.glb"
+      // },
+    ];
+
+    function createCard(creation) {
+      const card = document.createElement('div');
+      card.className = 'creation-card';
+
+      const hasModel = creation.glb && creation.glb.trim() !== '';
+
+      card.innerHTML = `
+        <div class="child-name">
+          ${creation.enfant}
+        </div>
+
+        ${creation.titre ? `<div style="padding: 8px 20px 0; font-size:0.95rem; color:#94a3b8; font-weight:600;">${creation.titre}</div>` : ''}
+
+        <div class="model-wrapper">
+          ${hasModel 
+            ? `<model-viewer 
+                 src="${creation.glb}" 
+                 ${creation.poster ? `poster="${creation.poster}"` : ''}
+                 alt="Modèle 3D de ${creation.enfant}"
+                 auto-rotate 
+                 camera-controls 
+                 shadow-intensity="1"
+                 exposure="1.1"
+                 loading="eager"
+                 style="width:100%; height:320px; border-radius:14px; position:relative; --poster-color: #1e2937;">
+                 
+                 <!-- Custom Progress Bar (Vibrant Green) -->
+                 <div class="progress-bar-container" style="position:absolute; inset:0; background:rgba(15,23,42,0.75); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; transition:opacity 0.3s; border-radius:14px; z-index:50;">
+                   <div style="color:#22c55e; font-size:13px; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                     <span>⌛</span>
+                     <span>Chargement du modèle 3D...</span>
+                   </div>
+                   <div style="width:70%; height:10px; background:#1e2937; border-radius:999px; overflow:hidden; border:1px solid #334155;">
+                     <div class="update-bar" style="height:100%; background:#22c55e; width:0%; transition:width 0.15s; box-shadow:0 0 8px rgba(34,197,94,0.5);"></div>
+                   </div>
+                   <div class="progress-txt" style="color:#22c55e; font-weight:bold; font-size:12px; margin-top:6px; font-family:monospace;">0%</div>
+                 </div>
+               </model-viewer>`
+            : `<div style="height:320px; background:#334155; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:0.95rem;">
+                 Fichier .glb non trouvé
+               </div>`
+          }
+        </div>
+
+        <div class="description">
+          <div class="description-label">Description</div>
+          <div>${creation.description || "Pas de description pour le moment."}</div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function renderGallery() {
+      const container = document.getElementById('gallery');
+
+      if (!creations || creations.length === 0) {
+        container.innerHTML = `
+          <div class="empty" style="grid-column: 1 / -1;">
+            Aucune création 3D pour le moment.<br>
+            Ajoute des modèles dans le code.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      creations.forEach(creation => {
+        const card = createCard(creation);
+        container.appendChild(card);
+
+        const viewer = card.querySelector('model-viewer');
+        if (viewer) {
+          const containerBar = viewer.querySelector('.progress-bar-container');
+          const updateBar = viewer.querySelector('.update-bar');
+          const txt = viewer.querySelector('.progress-txt');
+          
+          if (containerBar && updateBar && txt) {
+            viewer.addEventListener('progress', (event) => {
+              const progress = event.detail.totalProgress;
+              const percent = Math.round(progress * 100);
+              updateBar.style.width = `${percent}%`;
+              txt.innerText = `${percent}%`;
+              
+              if (progress === 1) {
+                setTimeout(() => {
+                  containerBar.style.opacity = '0';
+                  setTimeout(() => {
+                    containerBar.style.display = 'none';
+                  }, 300);
+                }, 300);
+              }
+            });
+          }
+        }
+      });
+    }
+
+    function initMenu() {
+      const burger = document.getElementById('burger-btn');
+      const drawer = document.getElementById('mobile-drawer');
+      const panel = document.getElementById('drawer-panel');
+      const backdrop = document.getElementById('drawer-backdrop');
+      const closeBtn = document.getElementById('drawer-close');
+
+      if (!burger || !drawer || !panel) return;
+
+      function openDrawer() {
+        drawer.classList.remove('hidden');
+        drawer.classList.add('flex');
+        // Trigger slide from right to left
+        requestAnimationFrame(() => {
+          panel.classList.remove('translate-x-full');
+          panel.classList.add('translate-x-0');
+        });
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDrawer() {
+        panel.classList.remove('translate-x-0');
+        panel.classList.add('translate-x-full');
+        
+        setTimeout(() => {
+          drawer.classList.remove('flex');
+          drawer.classList.add('hidden');
+          document.body.style.overflow = '';
+        }, 280);
+      }
+
+      // Open
+      burger.addEventListener('click', openDrawer);
+
+      // Close actions
+      if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+      if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+      // Close drawer when clicking any link inside
+      const links = drawer.querySelectorAll('.drawer-link');
+      links.forEach(link => {
+        link.addEventListener('click', () => {
+          closeDrawer();
+        });
+      });
+
+      // Close on ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.classList.contains('hidden')) {
+          closeDrawer();
+        }
+      });
+
+      console.log('%c[Menu] Fixed responsive menu initialized', 'color:#64748b');
+    }
+
+    function init() {
+      renderGallery();
+      initMenu();
+      console.log('%c[3D.html] Galerie des créations 3D chargée', 'color:#64748b');
+    }
+    
+    window.onload = init;
+  </script>
+</body>
+</html>

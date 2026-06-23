@@ -2,28 +2,46 @@
 
 # 🎨➡️🧊 Atelier : Mon dessin devient 3D
 
-## Objectif
+## Structure actuelle
 
-Aujourd’hui, tu vas inventer et dessiner quelque chose que tu aimes ou que tu imagines.
+- **`index.html`** → Page principale de l’atelier (pour les enfants)
+  - Idées de dessins
+  - Étapes claires
+  - **Fiche création** imprimable (à remplir à la main ou à imprimer)
 
-Ensuite, ton dessin sera transformé en **création 3D** grâce à l’intelligence artificielle.
+- **`3D.html`** → Visionneuse 3D pour les modèles GLB générés avec Meshy AI
+
+### Utilisation
+
+```bash
+# Lancer localement
+python3 -m http.server
+
+# Puis ouvrir :
+# http://localhost:8000          → Atelier + fiche
+# http://localhost:8000/3D.html  → Visionneuse 3D
+```
+
+### Pour afficher un modèle 3D
+
+**Via URL :**
+`3D.html?model=ton-modele.glb&name=Nom%20de%20la%20création`
+
+Exemple :
+- `3D.html?model=link.glb&name=Super%20Link`
+
+**Test local :**
+Ouvre `3D.html` et clique sur « Charger un .glb local » (idéal pour tester avant de mettre en ligne).
+
+Le modèle final doit être hébergé (GitHub Pages, etc.) pour être visible publiquement.
 
 ---
 
-## Mission des enfants
+# 🎨➡️🧊 Atelier : Mon dessin devient 3D
 
-Dessine au choix :
+Le contenu détaillé (idées, missions, etc.) est maintenant intégré directement dans la page `index.html`.
 
-- un personnage
-- un animal
-- un objet magique
-- un véhicule
-- une créature fantastique
-- une maison
-- une planète
-- une nourriture vivante
-- un héros
-- quelque chose que tu adores
+Tu peux aussi garder cette liste pour imprimer des affiches d’inspiration.
 
 ---
 

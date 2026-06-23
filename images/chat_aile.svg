@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <g fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Wings -->
+    <!-- Left Wing -->
+    <path d="M 38 54 Q 12 40 18 28 Q 28 25 38 48" />
+    <path d="M 36 48 Q 22 40 24 33 Q 32 31 38 48" />
+    
+    <!-- Right Wing -->
+    <path d="M 62 54 Q 88 40 82 28 Q 72 25 62 48" />
+    <path d="M 64 48 Q 78 40 76 33 Q 68 31 62 48" />
+    
+    <!-- Body -->
+    <path d="M 42 58 Q 30 75 40 85 C 45 88, 55 88, 60 85 Q 70 75 58 58 Z" />
+    
+    <!-- Tail -->
+    <path d="M 58 75 Q 78 78 80 62 Q 81 50 75 50 Q 70 50 72 58 Q 73 66 77 66" />
+    
+    <!-- Paws -->
+    <path d="M 43 85 L 43 88 C 43 91, 37 91, 37 88 C 37 85, 41 85, 41 85" />
+    <path d="M 57 85 L 57 88 C 57 91, 63 91, 63 88 C 63 85, 59 85, 59 85" />
+    
+    <!-- Head -->
+    <circle cx="50" cy="42" r="14" />
+    
+    <!-- Left Ear -->
+    <path d="M 38 35 L 32 15 L 45 29 Z" />
+    
+    <!-- Right Ear -->
+    <path d="M 62 35 L 68 15 L 55 29 Z" />
+    
+    <!-- Face Details -->
+    <!-- Eyes -->
+    <circle cx="45" cy="40" r="1.5" fill="#1e293b" />
+    <circle cx="55" cy="40" r="1.5" fill="#1e293b" />
+    
+    <!-- Nose -->
+    <polygon points="49,44 51,44 50,45.5" fill="#1e293b" stroke="#1e293b" />
+    
+    <!-- Mouth -->
+    <path d="M 47 48 Q 50 50 50 48 Q 50 50 53 48" />
+    
+    <!-- Whiskers -->
+    <path d="M 34 43 L 22 41" />
+    <path d="M 34 45 L 20 45" />
+    <path d="M 34 47 L 22 49" />
+    
+    <path d="M 66 43 L 78 41" />
+    <path d="M 66 45 L 80 45" />
+    <path d="M 66 47 L 78 49" />
+  </g>
+</svg>

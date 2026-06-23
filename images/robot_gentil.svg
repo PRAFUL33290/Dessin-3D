@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <g fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Antenna -->
+    <path d="M 50 24 L 50 12" stroke-width="2.5" />
+    <circle cx="50" cy="9" r="3.5" />
+    <!-- Light glows -->
+    <path d="M 43 9 A 7 7 0 0 1 57 9" stroke-width="1" stroke-dasharray="2 2" />
+    
+    <!-- Neck -->
+    <path d="M 45 44 L 45 48 L 55 48 L 55 44" />
+    <path d="M 42 46 L 58 46" stroke-width="1.5" />
+    
+    <!-- Head -->
+    <rect x="33" y="24" width="34" height="20" rx="4" />
+    
+    <!-- Side Bolts (Ears) -->
+    <rect x="29" y="31" width="4" height="6" rx="1" />
+    <rect x="67" y="31" width="4" height="6" rx="1" />
+    
+    <!-- Eyes -->
+    <circle cx="42" cy="34" r="4.5" />
+    <circle cx="42" cy="34" r="1.5" fill="#1e293b" />
+    
+    <circle cx="58" cy="34" r="4.5" />
+    <circle cx="58" cy="34" r="1.5" fill="#1e293b" />
+    
+    <!-- Mouth (Digital Smile) -->
+    <path d="M 43 40 L 57 40" stroke-width="2" />
+    <path d="M 46 39 L 46 41" stroke-width="1.5" />
+    <path d="M 50 39 L 50 41" stroke-width="1.5" />
+    <path d="M 54 39 L 54 41" stroke-width="1.5" />
+    
+    <!-- Body (Torso) -->
+    <rect x="28" y="48" width="44" height="28" rx="5" />
+    
+    <!-- Screen on Chest -->
+    <rect x="35" y="53" width="30" height="14" rx="2" />
+    <!-- Oscilloscope line inside screen -->
+    <path d="M 38 60 Q 42 55 45 60 Q 48 65 51 60 T 57 60 Q 60 60 62 60" stroke-width="1.5" />
+    
+    <!-- Bottom Buttons on Chest -->
+    <circle cx="40" cy="71" r="2" fill="#1e293b" />
+    <circle cx="47" cy="71" r="2" />
+    <circle cx="54" cy="71" r="2" />
+    <rect x="59" y="70" width="6" height="2" rx="0.5" fill="#1e293b" />
+    
+    <!-- Flexible Arms -->
+    <!-- Left Arm -->
+    <path d="M 28 54 Q 14 54 18 68" stroke-width="2.5" />
+    <!-- Left Clamp Hand -->
+    <path d="M 14 66 C 12 70, 18 76, 22 71" stroke-width="2" />
+    <path d="M 14 66 Q 20 64 22 71" stroke-width="1.5" />
+    
+    <!-- Right Arm -->
+    <path d="M 72 54 Q 86 54 82 68" stroke-width="2.5" />
+    <!-- Right Clamp Hand -->
+    <path d="M 86 66 C 88 70, 82 76, 78 71" stroke-width="2" />
+    <path d="M 86 66 Q 80 64 78 71" stroke-width="1.5" />
+    
+    <!-- Legs -->
+    <!-- Left Leg -->
+    <rect x="36" y="76" width="6" height="11" rx="1" />
+    <path d="M 36 81 L 42 81" stroke-width="1.5" stroke-dasharray="1 2" />
+    <path d="M 36 84 L 42 84" stroke-width="1.5" stroke-dasharray="1 2" />
+    <!-- Left Foot -->
+    <path d="M 32 87 L 44 87 L 44 91 Q 38 93 32 91 Z" />
+    
+    <!-- Right Leg -->
+    <rect x="58" y="76" width="6" height="11" rx="1" />
+    <path d="M 58 81 L 64 81" stroke-width="1.5" stroke-dasharray="1 2" />
+    <path d="M 58 84 L 64 84" stroke-width="1.5" stroke-dasharray="1 2" />
+    <!-- Right Foot -->
+    <path d="M 56 87 L 68 87 L 68 91 Q 62 93 56 91 Z" />
+  </g>
+</svg>

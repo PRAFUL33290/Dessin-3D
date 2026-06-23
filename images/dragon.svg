@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <g fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Wing (Background) -->
+    <path d="M 48 50 Q 30 35 38 25 Q 46 25 50 45" />
+    <path d="M 43 38 C 39 33, 41 29, 38 25" />
+    
+    <!-- Tail (Curling) -->
+    <path d="M 36 82 Q 12 85 14 62 Q 15 48 28 50 C 35 52, 30 65, 23 65 C 16 65, 18 78, 36 82" />
+    
+    <!-- Spikes on Tail -->
+    <polygon points="11,75 7,70 14,66" />
+    <polygon points="12,61 9,55 16,53" />
+    <polygon points="18,49 17,42 24,46" />
+    
+    <!-- Body -->
+    <path d="M 52 46 C 34 48, 32 85, 50 88 C 62 89, 72 82, 68 68 C 65 55, 60 48, 52 46 Z" />
+    
+    <!-- Cute feet -->
+    <!-- Left Foot -->
+    <path d="M 42 86 C 42 92, 50 92, 50 86" />
+    <path d="M 45 86 L 45 90" stroke-width="1.5" />
+    <path d="M 47 86 L 47 90" stroke-width="1.5" />
+    
+    <!-- Right Foot -->
+    <path d="M 58 86 C 58 92, 66 92, 66 86" />
+    <path d="M 61 86 L 61 90" stroke-width="1.5" />
+    <path d="M 63 86 L 63 90" stroke-width="1.5" />
+    
+    <!-- Spine spikes on back -->
+    <polygon points="41,52 36,46 45,48" />
+    <polygon points="46,62 41,57 49,58" />
+    
+    <!-- Belly details (stripes) -->
+    <path d="M 44 56 Q 52 58 56 52" />
+    <path d="M 42 66 Q 52 68 59 62" />
+    <path d="M 44 76 Q 54 78 63 71" />
+    
+    <!-- Head -->
+    <path d="M 48 40 Q 50 20 68 20 C 76 20, 84 25, 82 36 C 80 47, 68 47, 56 46 Q 48 46 48 40 Z" />
+    
+    <!-- Horns -->
+    <path d="M 62 20 L 62 8 Q 66 6 68 11 L 68 20" />
+    <path d="M 72 20 L 75 11 Q 78 10 79 14 L 76 21" />
+    
+    <!-- Eye -->
+    <circle cx="62" cy="30" r="3.5" />
+    <circle cx="61.5" cy="29.5" r="1" fill="#1e293b" />
+    
+    <!-- Smile -->
+    <path d="M 70 38 Q 75 42 78 36" />
+    <path d="M 78 36 L 76 34" />
+    
+    <!-- Nostril -->
+    <circle cx="77" cy="30" r="0.75" fill="#1e293b" />
+    
+    <!-- Wing (Foreground) -->
+    <path d="M 54 52 Q 72 44 68 30 Q 58 32 52 48" />
+    <path d="M 58 43 C 62 38, 60 34, 68 30" />
+  </g>
+</svg>

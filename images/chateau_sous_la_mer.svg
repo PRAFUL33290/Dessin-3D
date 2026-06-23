@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <g fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Sandy Sea Floor -->
+    <path d="M 8 85 C 25 81, 75 81, 92 85" />
+    
+    <!-- Left Seaweed -->
+    <path d="M 14 84 Q 6 62 16 48" stroke-width="2.2" />
+    <path d="M 18 84 Q 25 68 18 55" stroke-width="1.8" stroke-dasharray="1 2" />
+    
+    <!-- Right Seaweed -->
+    <path d="M 86 84 Q 94 65 85 45" stroke-width="2.2" />
+    <path d="M 82 84 Q 76 72 82 60" stroke-width="1.8" stroke-dasharray="1 2" />
+    
+    <!-- Starfish on Floor -->
+    <!-- Centered around (24, 83) -->
+    <path d="M 24 79 L 26 82 L 29 82 L 27 84 L 28 87 L 24 85 L 20 87 L 21 84 L 19 82 L 22 82 Z" stroke-width="1.8" />
+    
+    <!-- Shell on Floor -->
+    <path d="M 74 83 Q 76 78 80 81 Q 81 84 76 84 Z" stroke-width="1.8" />
+    
+    <!-- Left Tower -->
+    <path d="M 23 60 L 33 60 L 33 83 L 23 83 Z" />
+    <path d="M 21 60 L 28 42 L 35 60 Z" /> <!-- Cone Roof -->
+    <path d="M 28 42 L 28 32 L 34 35 L 28 38" /> <!-- Flag -->
+    <rect x="26" y="66" width="4" height="6" rx="2" /> <!-- Window -->
+    
+    <!-- Right Tower -->
+    <path d="M 67 60 L 77 60 L 77 83 L 67 83 Z" />
+    <path d="M 65 60 L 72 42 L 79 60 Z" /> <!-- Cone Roof -->
+    <path d="M 72 42 L 72 32 L 78 35 L 72 38" /> <!-- Flag -->
+    <rect x="70" y="66" width="4" height="6" rx="2" /> <!-- Window -->
+    
+    <!-- Central Main Castle Body & Tower -->
+    <path d="M 37 54 L 63 54 L 63 83 L 37 83 Z" />
+    <!-- Battlements on main block -->
+    <path d="M 37 54 L 37 48 L 42 48 L 42 54 L 47 54 L 47 48 L 53 48 L 53 54 L 58 54 L 58 48 L 63 48 L 63 54" />
+    
+    <!-- Center Turret -->
+    <path d="M 44 48 L 56 48 L 56 36 L 44 36 Z" />
+    <path d="M 42 36 L 50 20 L 58 36 Z" /> <!-- Center Roof -->
+    <circle cx="50" cy="42" r="3" /> <!-- Round Window -->
+    
+    <!-- Main Gate / Archway -->
+    <path d="M 45 83 L 45 70 C 45 64, 55 64, 55 70 L 55 83" stroke-width="3" />
+    
+    <!-- Tiny Fish Swimming -->
+    <!-- Fish 1 (Top Left) -->
+    <path d="M 34 25 Q 26 18 20 23 Q 26 28 34 25 Z" />
+    <path d="M 20 23 L 15 19 L 17 23 L 15 27 Z" />
+    <circle cx="29" cy="24" r="0.5" fill="#1e293b" />
+    
+    <!-- Fish 2 (Top Right) -->
+    <path d="M 70 18 Q 76 13 81 17 Q 76 21 70 18 Z" />
+    <path d="M 81 17 L 85 14 L 83 17 L 85 20 Z" />
+    <circle cx="74" cy="17" r="0.5" fill="#1e293b" />
+    
+    <!-- Undersea Bubbles -->
+    <circle cx="50" cy="11" r="3" />
+    <circle cx="48" cy="6" r="1.5" />
+    <circle cx="39" cy="34" r="2" />
+    <circle cx="41" cy="29" r="1" />
+    <circle cx="61" cy="28" r="2" />
+    <circle cx="63" cy="23" r="1" />
+  </g>
+</svg>
