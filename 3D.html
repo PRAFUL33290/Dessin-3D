@@ -6,6 +6,7 @@
   <title>Le Musée des Créations 3D • Dessin 3D</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <style>
     body {
@@ -281,6 +282,14 @@
     Format GLB généré avec Meshy AI • Le Musée des Créations du Futur
   </footer>
 
+  <!-- FULLSCREEN BUTTON -->
+  <button id="fullscreen-btn"
+          onclick="toggleFullscreen()"
+          title="Plein écran"
+          style="position:fixed; bottom:24px; right:24px; z-index:500; width:52px; height:52px; border-radius:999px; background:#6366f1; color:white; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.25rem; box-shadow:0 4px 20px rgba(99,102,241,0.5); transition:background 0.2s, transform 0.15s;">
+    <i id="fullscreen-icon" class="fa-solid fa-expand"></i>
+  </button>
+
   <script>
     // =====================================================
     // LISTE DES CRÉATIONS 3D DES ENFANTS
@@ -291,8 +300,8 @@
         enfant: "Arthur",
         titre: "Super-héros du Futur",
         description: "Un super-héros courageux prêt à sauver le monde avec ses super-pouvoirs.",
-        glb: "3D MODEL/Super-he\u0301ros.glb",
-        poster: "3D MODEL/Super Hero.png"
+        glb: "3D MODEL/super-heros.glb",
+        poster: "3D MODEL/super-hero.png"
       },
       {
         enfant: "Léa",
@@ -335,20 +344,19 @@
         ${creation.titre ? `<div style="padding: 8px 20px 0; font-size:0.95rem; color:#94a3b8; font-weight:600;">${creation.titre}</div>` : ''}
 
         <div class="model-wrapper">
-          ${hasModel 
-            ? `<model-viewer 
-                 src="${creation.glb}" 
-                 ${creation.poster ? `poster="${creation.poster}"` : ''}
-                 alt="Modèle 3D de ${creation.enfant}"
-                 auto-rotate 
-                 camera-controls 
-                 shadow-intensity="1"
-                 exposure="1.1"
-                 loading="eager"
-                 style="width:100%; height:320px; border-radius:14px; position:relative; --poster-color: #1e2937;">
-                 
-                 <!-- Custom Progress Bar (Vibrant Green) -->
-                 <div class="progress-bar-container" style="position:absolute; inset:0; background:rgba(15,23,42,0.75); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; transition:opacity 0.3s; border-radius:14px; z-index:50;">
+          ${hasModel
+            ? `<div style="position:relative; width:100%; height:320px;">
+                 <model-viewer
+                   src="${creation.glb}"
+                   alt="Modèle 3D de ${creation.enfant}"
+                   auto-rotate
+                   camera-controls
+                   shadow-intensity="1"
+                   exposure="1.1"
+                   loading="eager"
+                   style="width:100%; height:100%; border-radius:14px; --poster-color: #1e2937; background-color:#1e2937;">
+                 </model-viewer>
+                 <div class="progress-bar-container" style="position:absolute; inset:0; background:rgba(15,23,42,0.8); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; transition:opacity 0.3s; border-radius:14px; z-index:10;">
                    <div style="color:#22c55e; font-size:13px; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
                      <span>⌛</span>
                      <span>Chargement du modèle 3D...</span>
@@ -358,7 +366,7 @@
                    </div>
                    <div class="progress-txt" style="color:#22c55e; font-weight:bold; font-size:12px; margin-top:6px; font-family:monospace;">0%</div>
                  </div>
-               </model-viewer>`
+               </div>`
             : `<div style="height:320px; background:#334155; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:0.95rem;">
                  Fichier .glb non trouvé
                </div>`
@@ -394,26 +402,26 @@
 
         const viewer = card.querySelector('model-viewer');
         if (viewer) {
-          const containerBar = viewer.querySelector('.progress-bar-container');
-          const updateBar = viewer.querySelector('.update-bar');
-          const txt = viewer.querySelector('.progress-txt');
-          
+          const wrapper = viewer.parentElement;
+          const containerBar = wrapper ? wrapper.querySelector('.progress-bar-container') : null;
+          const updateBar = wrapper ? wrapper.querySelector('.update-bar') : null;
+          const txt = wrapper ? wrapper.querySelector('.progress-txt') : null;
+
+          function hideBar() {
+            if (!containerBar) return;
+            containerBar.style.opacity = '0';
+            containerBar.style.pointerEvents = 'none';
+            setTimeout(() => { containerBar.style.display = 'none'; }, 350);
+          }
+
           if (containerBar && updateBar && txt) {
             viewer.addEventListener('progress', (event) => {
-              const progress = event.detail.totalProgress;
-              const percent = Math.round(progress * 100);
+              const percent = Math.round(event.detail.totalProgress * 100);
               updateBar.style.width = `${percent}%`;
               txt.innerText = `${percent}%`;
-              
-              if (progress === 1) {
-                setTimeout(() => {
-                  containerBar.style.opacity = '0';
-                  setTimeout(() => {
-                    containerBar.style.display = 'none';
-                  }, 300);
-                }, 300);
-              }
             });
+            viewer.addEventListener('load', hideBar);
+            setTimeout(() => { if (containerBar.style.display !== 'none') hideBar(); }, 12000);
           }
         }
       });
@@ -482,6 +490,31 @@
     }
     
     window.onload = init;
+
+    function toggleFullscreen() {
+      const btn = document.getElementById('fullscreen-btn');
+      const icon = document.getElementById('fullscreen-icon');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          icon.className = 'fa-solid fa-compress';
+          btn.style.background = '#334155';
+        });
+      } else {
+        document.exitFullscreen().then(() => {
+          icon.className = 'fa-solid fa-expand';
+          btn.style.background = '#6366f1';
+        });
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const icon = document.getElementById('fullscreen-icon');
+      const btn = document.getElementById('fullscreen-btn');
+      if (!document.fullscreenElement) {
+        icon.className = 'fa-solid fa-expand';
+        btn.style.background = '#6366f1';
+      }
+    });
   </script>
 </body>
 </html>
