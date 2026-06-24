@@ -73,10 +73,14 @@
       </a>
 
       <!-- Desktop Menu -->
-      <div class="hidden md:flex items-center gap-x-3 text-base font-semibold">
-        <a href="index.html" class="px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">Accueil</a>
-        <a href="3D.html" 
-           class="flex items-center gap-x-2 px-5 py-2 bg-slate-900 hover:bg-black transition-colors text-white rounded-2xl text-base font-semibold">
+      <div class="hidden lg:flex items-center gap-x-3 text-base font-semibold">
+        <a href="index.html" class="flex items-center gap-x-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-2xl transition-colors" aria-current="page">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
+        </a>
+        <a href="exemple.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 14.2 8.8 20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"></path><path d="m19 3 .6 1.4L21 5l-1.4.6L19 7l-.6-1.4L17 5l1.4-.6L19 3Z"></path></svg><span>Exemple</span>
+        </a>
+        <a href="3D.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
           <span>Le Musée 3D</span>
         </a>
@@ -84,7 +88,7 @@
 
       <!-- Mobile Burger (right side) -->
       <button id="burger-btn" 
-              class="md:hidden w-10 h-10 flex items-center justify-center text-2xl text-slate-700 hover:text-indigo-600 transition-colors"
+              class="lg:hidden w-10 h-10 flex items-center justify-center text-2xl text-slate-700 hover:text-indigo-600 transition-colors"
               aria-label="Menu">
         <i class="fa-solid fa-bars"></i>
       </button>
@@ -92,7 +96,7 @@
   </nav>
 
   <!-- MOBILE DRAWER (slides from RIGHT to LEFT) -->
-  <div id="mobile-drawer" class="hidden md:hidden fixed inset-0 z-[110]">
+  <div id="mobile-drawer" class="hidden lg:hidden fixed inset-0 z-[110]">
     <!-- Backdrop -->
     <div id="drawer-backdrop" 
          class="absolute inset-0 bg-black/50 transition-opacity"></div>
@@ -114,12 +118,13 @@
 
       <!-- Menu Items -->
       <div class="flex flex-col py-2 text-lg">
-        <a href="#" class="drawer-link px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">Accueil</a>
-        
-        <div class="my-2 border-t"></div>
-        
-        <a href="3D.html" 
-           class="drawer-link mx-4 mt-1 flex items-center justify-center gap-x-2 px-5 py-3 bg-slate-900 hover:bg-black transition-colors text-white rounded-2xl text-base font-semibold">
+        <a href="index.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-indigo-700 bg-indigo-50 font-semibold" aria-current="page">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
+        </a>
+        <a href="exemple.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 14.2 8.8 20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"></path><path d="m19 3 .6 1.4L21 5l-1.4.6L19 7l-.6-1.4L17 5l1.4-.6L19 3Z"></path></svg><span>Exemple</span>
+        </a>
+        <a href="3D.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
           <span>Le Musée 3D</span>
         </a>
