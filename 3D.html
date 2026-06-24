@@ -64,43 +64,6 @@
       gap: 28px;
     }
 
-    .load-more-wrap {
-      display: none;
-      justify-content: center;
-      margin-top: 32px;
-    }
-
-    .load-more-wrap[hidden] {
-      display: none;
-    }
-
-    .load-more-button {
-      padding: 13px 28px;
-      color: white;
-      background: #6366f1;
-      border: 0;
-      border-radius: 14px;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 8px 22px rgba(99, 102, 241, 0.3);
-      transition: background 0.2s, transform 0.15s;
-    }
-
-    .load-more-button:hover {
-      background: #4f46e5;
-    }
-
-    .load-more-button:active {
-      transform: scale(0.97);
-    }
-
-    @media (min-width: 769px) {
-      .load-more-wrap {
-        display: flex;
-      }
-    }
-
     .creation-card {
       background: #1e2937;
       border-radius: 20px;
@@ -391,12 +354,6 @@
       <!-- Les cartes sont générées automatiquement par le script -->
     </div>
 
-    <div id="load-more-wrap" class="load-more-wrap" hidden>
-      <button id="load-more" class="load-more-button" type="button">
-        Voir plus
-      </button>
-    </div>
-
     <div class="upcoming-models" role="status">
       ✨ Les prochains modèles 3D arrivent bientôt… Merci de votre patience !
     </div>
@@ -567,8 +524,6 @@
 
     function renderGallery() {
       const container = document.getElementById('gallery');
-      const loadMoreWrap = document.getElementById('load-more-wrap');
-      const loadMoreButton = document.getElementById('load-more');
 
       if (!creations || creations.length === 0) {
         container.innerHTML = `
@@ -664,42 +619,9 @@
         }
       });
 
-      let displayedCards = 0;
-      const isDesktop = () => window.matchMedia('(min-width: 769px)').matches;
-      const getCardsPerRow = () => {
-        const gap = 28;
-        const minimumCardWidth = 320;
-        return Math.max(1, Math.floor((container.clientWidth + gap) / (minimumCardWidth + gap)));
-      };
-
-      function updateLoadMoreButton() {
-        loadMoreWrap.hidden = !isDesktop() || displayedCards >= cards.length;
-      }
-
-      function appendCards(amount) {
-        const end = Math.min(displayedCards + amount, cards.length);
-        const fragment = document.createDocumentFragment();
-        while (displayedCards < end) {
-          fragment.appendChild(cards[displayedCards]);
-          displayedCards += 1;
-        }
-        container.appendChild(fragment);
-        updateLoadMoreButton();
-      }
-
-      appendCards(isDesktop() ? getCardsPerRow() : cards.length);
-
-      loadMoreButton.addEventListener('click', () => {
-        appendCards(getCardsPerRow());
-      });
-
-      window.addEventListener('resize', () => {
-        if (!isDesktop() && displayedCards < cards.length) {
-          appendCards(cards.length - displayedCards);
-        } else {
-          updateLoadMoreButton();
-        }
-      });
+      const fragment = document.createDocumentFragment();
+      cards.forEach((card) => fragment.appendChild(card));
+      container.appendChild(fragment);
     }
 
     function initMenu() {
