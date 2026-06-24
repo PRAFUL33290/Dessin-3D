@@ -84,7 +84,7 @@
     }
 
     .child-name::before {
-      content: "👧";
+      content: "👤";
       font-size: 1.4rem;
     }
 
@@ -115,6 +115,101 @@
       color: #64748b;
       text-transform: uppercase;
       margin-bottom: 4px;
+    }
+
+    .validated-description {
+      margin: 0 20px 18px;
+      padding: 14px 16px;
+      color: #e2e8f0;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .validated-description[hidden] {
+      display: none;
+    }
+
+    .character-editor {
+      padding: 18px 20px 20px;
+      background: #1e2937;
+      border-top: 1px solid #334155;
+    }
+
+    .character-editor label {
+      display: block;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .character-editor textarea {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 92px;
+      resize: vertical;
+      padding: 12px 14px;
+      color: #f8fafc;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      font: inherit;
+      line-height: 1.45;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .character-editor textarea:focus {
+      border-color: #818cf8;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    .character-editor textarea::placeholder {
+      color: #64748b;
+    }
+
+    .editor-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .character-count,
+    .save-status {
+      color: #94a3b8;
+      font-size: 0.78rem;
+    }
+
+    .save-status {
+      color: #86efac;
+      font-weight: 600;
+    }
+
+    .validate-text {
+      flex-shrink: 0;
+      padding: 10px 18px;
+      color: white;
+      background: #6366f1;
+      border: 0;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .validate-text:hover {
+      background: #4f46e5;
+    }
+
+    .validate-text:active {
+      transform: scale(0.97);
     }
 
     .empty {
@@ -273,7 +368,7 @@
       <strong>Pour ajouter une nouvelle création :</strong><br>
       1. Place le fichier <code>.glb</code> dans le même dossier.<br>
       2. Ajoute un nouvel objet dans le tableau <code>creations</code> (voir les exemples ci-dessous dans le code).<br>
-      3. Champs : <code>enfant</code> (obligatoire), <code>titre</code> (optionnel), <code>description</code> et <code>glb</code>.
+      3. Champs : <code>enfant</code> (obligatoire) et <code>glb</code>.
     </div>
 
   </div>
@@ -295,60 +390,76 @@
     // LISTE DES CRÉATIONS 3D DES ENFANTS
     // Ajoute ou modifie les entrées ci-dessous.
     // =====================================================
+    // Le premier emplacement présente le modèle de la page d'accueil.
+    // Les 13 suivants restent disponibles pour les futures créations.
     const creations = [
       {
-        enfant: "Arthur",
-        titre: "Super-héros du Futur",
-        description: "Un super-héros courageux prêt à sauver le monde avec ses super-pouvoirs.",
-        glb: "3D MODEL/super-heros.glb",
-        poster: "3D MODEL/super-hero.png"
+        enfant: "Julien",
+        glb: "3D%20MODEL/super-heros.glb"
       },
-      {
-        enfant: "Léa",
-        titre: "Chat Ailé des Étoiles",
-        description: "Un chat ailé qui vole dans les étoiles et protège les rêves.",
-        glb: "lea-chat.glb"
-      },
-      {
-        enfant: "Noah",
-        titre: "Panda Ninja",
-        description: "Un super-héros panda qui combat les monstres avec des bananes.",
-        glb: "noah-panda.glb"
-      },
-      {
-        enfant: "Mia",
-        titre: "Licorne Pirate",
-        description: "Une licorne pirate sur son bateau volant rempli de bonbons.",
-        glb: "mia-licorne.glb"
-      }
-      // Ajoute les nouvelles créations ici :
-      // {
-      //   enfant: "Prénom de l'enfant",
-      //   titre: "Nom de sa création (optionnel)",
-      //   description: "Une brève description de son dessin.",
-      //   glb: "nom-du-fichier.glb"
-      // },
+      ...Array.from({ length: 13 }, (_, index) => ({
+        enfant: `Prénom ${index + 2}`,
+        glb: ""
+      }))
     ];
 
-    function createCard(creation) {
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function createEditor(creation, index) {
+      const storageKey = `dessin-3d-personnage-${index}`;
+      const savedText = (localStorage.getItem(storageKey) || '').trim();
+
+      return `
+        <div class="character-editor" data-storage-key="${storageKey}">
+          <label for="character-text-${index}">✏️ Écris quelques mots sur ton personnage</label>
+          <textarea id="character-text-${index}" maxlength="240" placeholder="Son nom, ses pouvoirs, son histoire...">${escapeHtml(savedText)}</textarea>
+          <div class="editor-actions">
+            <div>
+              <span class="character-count">${savedText.length}/240</span>
+              <span class="save-status" role="status" aria-live="polite"></span>
+            </div>
+            <button type="button" class="validate-text">✓ Valider</button>
+          </div>
+        </div>
+        <div class="validated-description"${savedText ? '' : ' hidden'}>
+          <div class="description-label">À propos du personnage</div>
+          <div class="validated-text">${escapeHtml(savedText)}</div>
+        </div>
+      `;
+    }
+
+    function createCard(creation, index) {
       const card = document.createElement('div');
       card.className = 'creation-card';
 
       const hasModel = creation.glb && creation.glb.trim() !== '';
 
-      card.innerHTML = `
-        <div class="child-name">
-          ${creation.enfant}
-        </div>
+      if (!hasModel) {
+        card.innerHTML = `
+          <div class="child-name">${creation.enfant || 'Prénom à définir'}</div>
+          <div class="model-wrapper">
+            <div style="height:320px; background:#334155; border-radius:14px;"></div>
+          </div>
+          ${createEditor(creation, index)}
+        `;
+        return card;
+      }
 
-        ${creation.titre ? `<div style="padding: 8px 20px 0; font-size:0.95rem; color:#94a3b8; font-weight:600;">${creation.titre}</div>` : ''}
+      card.innerHTML = `
+        ${creation.enfant ? `<div class="child-name">${creation.enfant}</div>` : ''}
 
         <div class="model-wrapper">
-          ${hasModel
-            ? `<div style="position:relative; width:100%; height:320px;">
+          <div style="position:relative; width:100%; height:320px;">
                  <model-viewer
                    src="${creation.glb}"
-                   alt="Modèle 3D de ${creation.enfant}"
+                   alt="Modèle 3D${creation.enfant ? ` de ${creation.enfant}` : ''}"
                    auto-rotate
                    camera-controls
                    shadow-intensity="1"
@@ -366,17 +477,9 @@
                    </div>
                    <div class="progress-txt" style="color:#22c55e; font-weight:bold; font-size:12px; margin-top:6px; font-family:monospace;">0%</div>
                  </div>
-               </div>`
-            : `<div style="height:320px; background:#334155; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:0.95rem;">
-                 Fichier .glb non trouvé
-               </div>`
-          }
+               </div>
         </div>
-
-        <div class="description">
-          <div class="description-label">Description</div>
-          <div>${creation.description || "Pas de description pour le moment."}</div>
-        </div>
+        ${createEditor(creation, index)}
       `;
 
       return card;
@@ -396,9 +499,35 @@
       }
 
       container.innerHTML = '';
-      creations.forEach(creation => {
-        const card = createCard(creation);
+      creations.forEach((creation, index) => {
+        const card = createCard(creation, index);
         container.appendChild(card);
+
+        const editor = card.querySelector('.character-editor');
+        const textarea = editor ? editor.querySelector('textarea') : null;
+        const counter = editor ? editor.querySelector('.character-count') : null;
+        const status = editor ? editor.querySelector('.save-status') : null;
+        const validateButton = editor ? editor.querySelector('.validate-text') : null;
+        const description = card.querySelector('.validated-description');
+        const validatedText = description ? description.querySelector('.validated-text') : null;
+
+        if (textarea && counter && status && validateButton && description && validatedText) {
+          textarea.addEventListener('input', () => {
+            counter.textContent = `${textarea.value.length}/240`;
+            status.textContent = '';
+          });
+
+          validateButton.addEventListener('click', () => {
+            const text = textarea.value.trim();
+            localStorage.setItem(editor.dataset.storageKey, text);
+            textarea.value = text;
+            counter.textContent = `${textarea.value.length}/240`;
+            validatedText.textContent = text;
+            description.hidden = text === '';
+            status.textContent = ' • Texte enregistré !';
+            setTimeout(() => { status.textContent = ''; }, 2500);
+          });
+        }
 
         const viewer = card.querySelector('model-viewer');
         if (viewer) {
