@@ -545,11 +545,10 @@
       }
 
       container.innerHTML = '';
-      // Les gros GLB de la galerie peuvent occuper plusieurs centaines de Mo
-      // une fois leurs textures décompressées. Safari/iPadOS finit alors par
-      // évincer les textures et ne garde que le matériau métallique.
-      const isIPad = /iPad|iPhone|iPod/.test(navigator.userAgent)
-        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      // Une fois qu'un modèle 3D est chargé, on le garde affiché en mémoire
+      // même lorsqu'il sort de l'écran : ainsi, en défilant vers le bas puis
+      // vers le haut, les modèles déjà chargés restent visibles sans avoir à
+      // se recharger.
       const visibleViewers = new WeakSet();
       function resetViewerProgress(viewer) {
         const overlay = viewer.parentElement?.querySelector('.progress-bar-container');
@@ -577,13 +576,8 @@
           }
 
           visibleViewers.delete(viewer);
-          if (isIPad && viewer.hasAttribute('src')) {
-            // Laisse un court délai pour éviter de recharger pendant un petit
-            // mouvement de défilement, puis libère réellement la mémoire GPU.
-            setTimeout(() => {
-              if (!visibleViewers.has(viewer)) viewer.removeAttribute('src');
-            }, 1500);
-          }
+          // On ne décharge plus les modèles une fois chargés : ils restent
+          // affichés quand on défile vers le bas puis qu'on remonte.
         });
       }, { rootMargin: '160px 0px', threshold: 0.01 });
 
