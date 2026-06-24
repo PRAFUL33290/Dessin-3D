@@ -58,11 +58,120 @@
     body {
       padding-top: 4rem;
     }
+
+    /* HERO 3D model : décalage bas qui remonte pour donner de la profondeur */
+    .hero-model {
+      animation: heroRise 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes heroRise {
+      from {
+        transform: translateY(60px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* model-viewer sans bordure ni ombre de focus */
+    model-viewer#hero-viewer:focus,
+    model-viewer#hero-viewer:focus-visible {
+      outline: none;
+    }
+
+    /* Calques d'ambiance autour du modèle 3D du hero (léger, qui flotte) */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .hero-bg.behind { z-index: 1; }    /* derrière le modèle (z-120) */
+    .hero-bg.front  { z-index: 121; }  /* devant le modèle, sous la nav (z-130) */
+
+    /* Lueur centrale douce et discrète */
+    .hero-bg .halo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 70%;
+      aspect-ratio: 1 / 1;
+      transform: translate(-50%, -48%);
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(253, 224, 71, 0.22) 0%,
+        rgba(255, 255, 255, 0.10) 42%,
+        rgba(255, 255, 255, 0) 72%);
+      animation: heroGlow 7s ease-in-out infinite;
+    }
+
+    /* Formes qui flottent doucement (cercles flous) */
+    .hero-bg .float {
+      position: absolute;
+      border-radius: 50%;
+      will-change: transform;
+    }
+    /* Derrière le modèle */
+    .hero-bg.behind .f1 {
+      width: 90px; height: 90px; top: 14%; left: 12%;
+      background: radial-gradient(circle, rgba(255,255,255,0.30), rgba(255,255,255,0));
+      animation: heroFloatA 11s ease-in-out infinite;
+    }
+    .hero-bg.behind .f2 {
+      width: 64px; height: 64px; bottom: 18%; right: 14%;
+      background: radial-gradient(circle, rgba(253,224,71,0.32), rgba(253,224,71,0));
+      animation: heroFloatB 13s ease-in-out infinite;
+    }
+    .hero-bg.behind .f3 {
+      width: 120px; height: 120px; bottom: 8%; left: 22%;
+      background: radial-gradient(circle, rgba(255,255,255,0.18), rgba(255,255,255,0));
+      animation: heroFloatC 16s ease-in-out infinite;
+    }
+    /* Devant le modèle (plus petites, plus discrètes) */
+    .hero-bg.front .f4 {
+      width: 38px; height: 38px; top: 22%; right: 18%;
+      background: radial-gradient(circle, rgba(255,255,255,0.45), rgba(255,255,255,0));
+      animation: heroFloatB 9s ease-in-out infinite;
+    }
+    .hero-bg.front .f5 {
+      width: 26px; height: 26px; bottom: 24%; left: 16%;
+      background: radial-gradient(circle, rgba(253,224,71,0.55), rgba(253,224,71,0));
+      animation: heroFloatA 12s ease-in-out infinite;
+    }
+    .hero-bg.front .f6 {
+      width: 18px; height: 18px; top: 50%; right: 10%;
+      background: radial-gradient(circle, rgba(255,255,255,0.5), rgba(255,255,255,0));
+      animation: heroFloatC 10s ease-in-out infinite;
+    }
+
+    @keyframes heroGlow {
+      0%, 100% { transform: translate(-50%, -48%) scale(1);    opacity: 0.7; }
+      50%      { transform: translate(-50%, -48%) scale(1.06); opacity: 1; }
+    }
+    @keyframes heroFloatA {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(10px, -18px); }
+    }
+    @keyframes heroFloatB {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(-14px, -12px); }
+    }
+    @keyframes heroFloatC {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(12px, 14px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-bg .halo,
+      .hero-bg .float { animation: none; }
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
   <!-- FIXED NAV -->
-  <nav id="main-nav" class="fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-[100] shadow-sm">
+  <nav id="main-nav" class="fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-[130] shadow-sm">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <!-- Logo + Title -->
       <a href="index.html" class="flex items-center gap-x-3">
@@ -77,10 +186,7 @@
         <a href="index.html" class="flex items-center gap-x-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-2xl transition-colors" aria-current="page">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
         </a>
-        <a href="exemple.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 14.2 8.8 20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"></path><path d="m19 3 .6 1.4L21 5l-1.4.6L19 7l-.6-1.4L17 5l1.4-.6L19 3Z"></path></svg><span>Exemple</span>
-        </a>
-        <a href="3D.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
+        <a href="3D.html" class="flex items-center gap-x-2 px-5 py-2 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 transition-all hover:scale-105 transform">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
           <span>Le Musée 3D</span>
         </a>
@@ -96,7 +202,7 @@
   </nav>
 
   <!-- MOBILE DRAWER (slides from RIGHT to LEFT) -->
-  <div id="mobile-drawer" class="hidden lg:hidden fixed inset-0 z-[110]">
+  <div id="mobile-drawer" class="hidden lg:hidden fixed inset-0 z-[140]">
     <!-- Backdrop -->
     <div id="drawer-backdrop" 
          class="absolute inset-0 bg-black/50 transition-opacity"></div>
@@ -121,13 +227,12 @@
         <a href="index.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-indigo-700 bg-indigo-50 font-semibold" aria-current="page">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
         </a>
-        <a href="exemple.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 14.2 8.8 20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"></path><path d="m19 3 .6 1.4L21 5l-1.4.6L19 7l-.6-1.4L17 5l1.4-.6L19 3Z"></path></svg><span>Exemple</span>
-        </a>
-        <a href="3D.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
-          <span>Le Musée 3D</span>
-        </a>
+        <div class="px-6 pt-3">
+          <a href="3D.html" class="drawer-link flex items-center justify-center gap-x-3 px-6 py-3.5 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 font-semibold transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
+            <span>Le Musée 3D</span>
+          </a>
+        </div>
       </div>
 
       <div class="mt-auto p-5 text-xs text-slate-400 border-t">
@@ -137,30 +242,84 @@
   </div>
 
   <!-- HERO -->
-  <header class="fun-gradient text-white py-14">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-      <div class="inline-flex items-center gap-x-2 bg-white/20 backdrop-blur px-4 py-1 rounded-3xl text-sm font-medium mb-6">
-        Atelier pour enfants • 5-12 ans
+  <header class="fun-gradient text-white relative overflow-x-clip">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 items-center gap-6 md:gap-8 min-h-[520px]">
+
+      <!-- GAUCHE : titre + slogan + bouton -->
+      <div class="text-center md:text-left pt-12 pb-4 md:py-16 relative z-10 order-2 md:order-1">
+        <div class="inline-flex items-center gap-x-2 bg-white/20 backdrop-blur px-4 py-1 rounded-3xl text-sm font-medium mb-6">
+          Atelier pour enfants • 5-12 ans
+        </div>
+
+        <h1 class="kid-title text-6xl md:text-7xl font-extrabold tracking-tighter leading-none mb-4">
+          Mon dessin<br>devient <span class="text-yellow-300">3D</span>
+        </h1>
+        <p class="text-2xl md:text-3xl text-white/90 mb-8 max-w-md mx-auto md:mx-0">
+          Dessine sur papier.<br>
+          Nous le transformerons en 3D magique !
+        </p>
+
+        <a href="3D.html" class="inline-flex items-center gap-x-3 px-8 py-4 bg-white text-indigo-700 hover:bg-yellow-50 active:bg-yellow-100 font-extrabold rounded-3xl shadow-xl shadow-indigo-900/20 transition-all text-lg tracking-tight hover:scale-105 transform">
+          <i class="fa-solid fa-cube text-xl"></i>
+          <span>Visiter le Musée 3D →</span>
+        </a>
       </div>
-      
-      <h1 class="kid-title text-6xl md:text-7xl font-extrabold tracking-tighter leading-none mb-4">
-        Mon dessin<br>devient <span class="text-yellow-300">3D</span>
-      </h1>
-      <p class="text-2xl md:text-3xl text-white/90 max-w-md mx-auto">
-        Dessine sur papier.<br>
-        Nous le transformerons en 3D magique !
-      </p>
+
+      <!-- DROITE : modèle 3D de Julien (rotatif, sans bordure) -->
+      <div class="relative h-[340px] md:h-full md:self-stretch md:min-h-[520px] order-1 md:order-2 z-[120]">
+        <!-- Ambiance légère qui flotte DERRIÈRE le modèle 3D -->
+        <div class="hero-bg behind" aria-hidden="true">
+          <span class="halo"></span>
+          <span class="float f1"></span>
+          <span class="float f2"></span>
+          <span class="float f3"></span>
+        </div>
+        <!-- Remplace data-src par "3D%20MODEL/Julien.glb" une fois le fichier ajouté -->
+        <model-viewer
+          id="hero-viewer"
+          data-src="3D%20MODEL/super-heros.glb"
+          alt="Modèle 3D de Julien"
+          camera-controls
+          disable-zoom
+          disable-pan
+          interaction-prompt="none"
+          touch-action="pan-y"
+          shadow-intensity="0"
+          exposure="1.15"
+          loading="eager"
+          class="hero-model"
+          style="width:100%; height:110%; background:transparent; position:absolute; bottom:-5%; left:0; z-index:120; overflow:visible;">
+        </model-viewer>
+
+        <!-- Ambiance légère qui flotte DEVANT le modèle 3D -->
+        <div class="hero-bg front" aria-hidden="true">
+          <span class="float f4"></span>
+          <span class="float f5"></span>
+          <span class="float f6"></span>
+        </div>
+
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/25 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full pointer-events-none flex items-center gap-x-1.5 shadow">
+          <span>🖱️</span><span>Fais-moi tourner</span>
+        </div>
+      </div>
+
     </div>
   </header>
 
   <!-- EXPOSITION -->
-  <div class="max-w-4xl mx-auto px-6 -mt-5 relative z-10">
-    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 py-4 px-6 text-center">
-      <div class="flex items-center justify-center gap-x-3">
-        <span class="text-3xl">🌟</span>
-        <div>
-          <div class="uppercase tracking-[2px] text-xs font-bold text-indigo-600">L'exposition</div>
-          <div class="kid-title text-2xl font-extrabold text-slate-900">Le Musée des Créations du Futur</div>
+  <div class="max-w-4xl mx-auto px-6 mt-24 md:mt-32 relative z-10">
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 py-4 px-6 text-left">
+      <div class="flex items-center justify-between gap-x-4 flex-wrap gap-y-3">
+        <div class="flex items-center gap-x-3">
+          <span class="text-3xl">🌟</span>
+          <div>
+            <div class="uppercase tracking-[2px] text-xs font-bold text-indigo-600">L'exposition</div>
+            <div class="kid-title text-2xl font-extrabold text-slate-900">Le Musée des Créations du Futur</div>
+          </div>
+        </div>
+        <div class="inline-flex items-center gap-x-2 bg-indigo-50 text-indigo-700 font-semibold text-sm px-4 py-2 rounded-2xl border border-indigo-100">
+          <i class="fa-regular fa-calendar-days"></i>
+          <span id="expo-date">24 juin 2026</span>
         </div>
       </div>
     </div>
@@ -244,7 +403,7 @@
         <div class="h-80 w-full bg-indigo-950/5 flex items-center justify-center rounded-2xl mb-4 relative overflow-hidden border border-indigo-100">
           <model-viewer
             id="superhero-viewer"
-            src="3D%20MODEL/super-heros.glb"
+            data-src="3D%20MODEL/super-heros.glb"
             alt="Modèle 3D Super-héros"
             camera-controls
             shadow-intensity="1.5"
@@ -562,6 +721,7 @@
     </div>
   </footer>
 
+  <script src="model-cache.js"></script>
   <script>
     let currentSvgPath = "";
     let currentTitle = "";
@@ -623,6 +783,10 @@
       iframe.style.border = '0';
       document.body.appendChild(iframe);
 
+      // Resolve the image path relative to the current page so it works both
+      // locally (site at root) and on GitHub Pages (served from /Dessin-3D/).
+      const printImgSrc = new URL(svgPath, window.location.href).href;
+
       // Write printable layout to the iframe
       iframe.contentWindow.document.write(`
         <!DOCTYPE html>
@@ -679,7 +843,7 @@
         </head>
         <body>
           <div class="container">
-            <img src="${window.location.origin + '/' + svgPath}" />
+            <img src="${printImgSrc}" />
             <h1>🎨 Mon Dessin Devient 3D • Coloriage : ${title}</h1>
           </div>
           <script>
@@ -782,15 +946,47 @@
       // 'load' fires reliably when the model is fully ready
       viewer.addEventListener('load', hideOverlay);
 
+      // Le fichier est conservé dans le cache persistant du navigateur. L'URL
+      // blob reste ensuite identique pendant toute la visite, même hors écran.
+      const modelSrc = viewer.dataset.src;
+      if (modelSrc) {
+        ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
+          if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
+        });
+      }
+
       // Fallback: hide after 12s even if no load event
       setTimeout(() => {
         if (progressBarContainer.style.display !== 'none') hideOverlay();
       }, 12000);
     }
 
+    function initHeroViewer() {
+      const viewer = document.getElementById('hero-viewer');
+      if (!viewer) return;
+
+      const modelSrc = viewer.dataset.src;
+      if (modelSrc) {
+        ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
+          if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
+        });
+      }
+    }
+
+    function initExpoDate() {
+      const el = document.getElementById('expo-date');
+      if (!el) return;
+      const today = new Date().toLocaleDateString('fr-FR', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+      el.textContent = today;
+    }
+
     function init() {
       initMenu();
+      initHeroViewer();
       initSuperheroViewer();
+      initExpoDate();
       console.log('%c[Atelier] Page simplifiée pour dessin papier prête', 'color:#64748b');
     }
     

@@ -154,83 +154,92 @@
       margin-bottom: 4px;
     }
 
-    .character-editor {
-      padding: 18px 20px 20px;
-      background: #1e2937;
-      border-top: 1px solid #334155;
+    /* La démarche : dessin → mis en forme → 3D */
+    .demarche {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 16px 16px 4px;
     }
 
-    .character-editor label {
-      display: block;
-      margin-bottom: 8px;
-      color: #e2e8f0;
-      font-size: 0.95rem;
-      font-weight: 600;
+    .demarche-step {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .character-editor textarea {
-      box-sizing: border-box;
-      width: 100%;
-      min-height: 92px;
-      resize: vertical;
-      padding: 12px 14px;
-      color: #f8fafc;
-      background: #0f172a;
-      border: 1px solid #475569;
-      border-radius: 12px;
-      font: inherit;
-      line-height: 1.45;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .character-editor textarea:focus {
-      border-color: #818cf8;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-    }
-
-    .character-editor textarea::placeholder {
-      color: #64748b;
-    }
-
-    .editor-actions {
+    .step-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .character-count,
-    .save-status {
-      color: #94a3b8;
-      font-size: 0.78rem;
-    }
-
-    .save-status {
-      color: #86efac;
-      font-weight: 600;
-    }
-
-    .validate-text {
-      flex-shrink: 0;
-      padding: 10px 18px;
-      color: white;
-      background: #6366f1;
-      border: 0;
-      border-radius: 12px;
-      font: inherit;
+      gap: 8px;
+      font-size: 0.9rem;
       font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
+      color: #cbd5e1;
     }
 
-    .validate-text:hover {
-      background: #4f46e5;
+    .step-head-3d {
+      padding: 4px 16px 12px;
     }
 
-    .validate-text:active {
-      transform: scale(0.97);
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      border-radius: 999px;
+      background: #6366f1;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .step-head-3d .step-num {
+      background: #22c55e;
+    }
+
+    .demarche-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 14px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      cursor: zoom-in;
+      transition: transform 0.15s, border-color 0.2s;
+    }
+
+    .demarche-img:hover {
+      transform: scale(1.02);
+      border-color: #6366f1;
+    }
+
+    /* Lightbox d'agrandissement des images */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      cursor: zoom-out;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
     }
 
     .empty {
@@ -309,10 +318,7 @@
         <a href="index.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
         </a>
-        <a href="exemple.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 14.2 8.8 20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"></path><path d="m19 3 .6 1.4L21 5l-1.4.6L19 7l-.6-1.4L17 5l1.4-.6L19 3Z"></path></svg><span>Exemple</span>
-        </a>
-        <a href="3D.html" class="flex items-center gap-x-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-2xl transition-colors" aria-current="page">
+        <a href="3D.html" class="flex items-center gap-x-2 px-5 py-2 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 transition-all hover:scale-105 transform" aria-current="page">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
           <span>Le Musée 3D</span>
         </a>
@@ -353,13 +359,12 @@
         <a href="index.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
         </a>
-        <a href="exemple.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 14.2 8.8 20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"></path><path d="m19 3 .6 1.4L21 5l-1.4.6L19 7l-.6-1.4L17 5l1.4-.6L19 3Z"></path></svg><span>Exemple</span>
-        </a>
-        <a href="3D.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-indigo-700 bg-indigo-50 font-semibold" aria-current="page">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
-          <span>Le Musée 3D</span>
-        </a>
+        <div class="px-6 pt-3">
+          <a href="3D.html" class="drawer-link flex items-center justify-center gap-x-3 px-6 py-3.5 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 font-semibold transition-colors" aria-current="page">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
+            <span>Le Musée 3D</span>
+          </a>
+        </div>
       </div>
 
       <div class="mt-auto p-5 text-xs text-slate-400 border-t">
@@ -378,7 +383,7 @@
     <!-- Navigation is now in the fixed top menu -->
 
     <div class="intro">
-      <p>Chaque enfant a dessiné sur papier. Voici leurs créations devenues de vrais modèles 3D !</p>
+      <p>Découvre la démarche : <strong>1.</strong> le dessin de l'enfant → <strong>2.</strong> la version mise en forme → <strong>3.</strong> le modèle 3D animé !</p>
     </div>
 
     <!-- La galerie des créations 3D -->
@@ -402,6 +407,11 @@
     Format GLB généré avec Meshy AI • Le Musée des Créations du Futur
   </footer>
 
+  <!-- LIGHTBOX pour agrandir les dessins -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
   <!-- FULLSCREEN BUTTON -->
   <button id="fullscreen-btn"
           onclick="toggleFullscreen()"
@@ -410,6 +420,7 @@
     <i id="fullscreen-icon" class="fa-solid fa-expand"></i>
   </button>
 
+  <script src="model-cache.js"></script>
   <script>
     // =====================================================
     // LISTE DES CRÉATIONS 3D DES ENFANTS
@@ -427,26 +438,38 @@
       },
       {
         enfant: "Corentin",
+        dessin: "Dessin%20enfants/Corentin.jpg",
+        realiste: "Dessin%20enfants/Corentin%20Re%CC%81aliste.png",
         glb: "3D%20MODEL/Corentin.glb"
       },
       {
         enfant: "Ilyes",
+        dessin: "Dessin%20enfants/Ilyes.jpg",
+        realiste: "Dessin%20enfants/Ilyes%20Re%CC%81aliste.png",
         glb: "3D%20MODEL/Ilyes.glb"
       },
       {
         enfant: "Ryad",
+        dessin: "Dessin%20enfants/Riad.jpg",
+        realiste: "Dessin%20enfants/Riad%20Re%CC%81aliste.png",
         glb: "3D%20MODEL/Ryad.glb"
       },
       {
         enfant: "Ryma",
+        dessin: "Dessin%20enfants/Ryma.jpg",
+        realiste: "Dessin%20enfants/Ryma%20Re%CC%81aliste.png",
         glb: "3D%20MODEL/Ryma.glb"
       },
       {
         enfant: "Thalia",
+        dessin: "Dessin%20enfants/Thalia.jpg",
+        realiste: "Dessin%20enfants/Thalia%20Re%CC%81aliste.png",
         glb: "3D%20MODEL/Thalia.glb"
       },
       {
         enfant: "Léo",
+        dessin: "Dessin%20enfants/Le%CC%81o.jpg",
+        realiste: "Dessin%20enfants/Le%CC%81o%20Re%CC%81aliste.png",
         glb: "3D%20MODEL/Le%CC%81o.glb"
       }
     ];
@@ -460,23 +483,32 @@
         .replaceAll("'", '&#039;');
     }
 
-    function createEditor(creation, index) {
-      const storageKey = `dessin-3d-personnage-${index}`;
-      const savedText = (localStorage.getItem(storageKey) || '').trim();
+    function createDemarche(creation) {
+      const hasDessin = creation.dessin && creation.dessin.trim() !== '';
+      const hasRealiste = creation.realiste && creation.realiste.trim() !== '';
+      if (!hasDessin && !hasRealiste) return '';
 
-      return `
-        <div class="character-editor" data-storage-key="${storageKey}">
-          <label for="character-text-${index}">✏️ Écris quelques mots sur ton personnage</label>
-          <textarea id="character-text-${index}" maxlength="240" placeholder="Son nom, ses pouvoirs, son histoire...">${escapeHtml(savedText)}</textarea>
-          <div class="editor-actions">
-            <div>
-              <span class="character-count">${savedText.length}/240</span>
-              <span class="save-status" role="status" aria-live="polite"></span>
-            </div>
-            <button type="button" class="validate-text">✓ Valider</button>
-          </div>
-        </div>
-      `;
+      const nom = creation.enfant ? ` de ${escapeHtml(creation.enfant)}` : '';
+      const etapes = [];
+
+      if (hasDessin) {
+        etapes.push(`
+          <figure class="demarche-step">
+            <div class="step-head"><span class="step-num">1</span> Le dessin</div>
+            <img class="demarche-img" src="${creation.dessin}" loading="lazy" alt="Dessin original${nom}">
+          </figure>
+        `);
+      }
+      if (hasRealiste) {
+        etapes.push(`
+          <figure class="demarche-step">
+            <div class="step-head"><span class="step-num">2</span> Mis en forme</div>
+            <img class="demarche-img" src="${creation.realiste}" loading="lazy" alt="Version mise en forme${nom}">
+          </figure>
+        `);
+      }
+
+      return `<div class="demarche">${etapes.join('')}</div>`;
     }
 
     function createCard(creation, index) {
@@ -484,14 +516,16 @@
       card.className = 'creation-card';
 
       const hasModel = creation.glb && creation.glb.trim() !== '';
+      const demarche = createDemarche(creation);
+      const has3DStep = demarche !== '';
 
       if (!hasModel) {
         card.innerHTML = `
           <div class="child-name">${creation.enfant || 'Prénom à définir'}</div>
+          ${demarche}
           <div class="model-wrapper">
             <div style="height:320px; background:#334155; border-radius:14px;"></div>
           </div>
-          ${createEditor(creation, index)}
         `;
         return card;
       }
@@ -499,7 +533,10 @@
       card.innerHTML = `
         ${creation.enfant ? `<div class="child-name">${creation.enfant}</div>` : ''}
 
+        ${demarche}
+
         <div class="model-wrapper">
+          ${has3DStep ? `<div class="step-head step-head-3d"><span class="step-num">3</span> En vrai 3D !</div>` : ''}
           <div style="position:relative; width:100%; height:320px;">
                  <model-viewer
                    data-src="${creation.glb}"
@@ -508,7 +545,7 @@
                    interaction-prompt="none"
                    shadow-intensity="1"
                    exposure="1.1"
-                   loading="lazy"
+                   loading="eager"
                    style="width:100%; height:100%; border-radius:14px; --poster-color: #1e2937; background-color:#1e2937;">
                  </model-viewer>
                  <div class="progress-bar-container" style="position:absolute; inset:0; background:rgba(15,23,42,0.8); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; transition:opacity 0.3s; border-radius:14px; z-index:10;">
@@ -523,7 +560,6 @@
                  </div>
                </div>
         </div>
-        ${createEditor(creation, index)}
       `;
 
       return card;
@@ -545,11 +581,8 @@
       }
 
       container.innerHTML = '';
-      // Une fois qu'un modèle 3D est chargé, on le garde affiché en mémoire
-      // même lorsqu'il sort de l'écran : ainsi, en défilant vers le bas puis
-      // vers le haut, les modèles déjà chargés restent visibles sans avoir à
-      // se recharger.
-      const visibleViewers = new WeakSet();
+      // Les sources sont affectées une seule fois. Le défilement ne pilote
+      // jamais le chargement et ne peut donc plus retirer un modèle.
       function resetViewerProgress(viewer) {
         const overlay = viewer.parentElement?.querySelector('.progress-bar-container');
         const bar = overlay?.querySelector('.update-bar');
@@ -561,51 +594,25 @@
         bar.style.width = '0%';
         text.innerText = '0%';
       }
-      const viewerObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          const viewer = entry.target;
-          const modelSrc = viewer.dataset.src;
+      function ensureViewerLoaded(viewer) {
+        const modelSrc = viewer.dataset.src;
+        if (!modelSrc || viewer.hasAttribute('src') || viewer.dataset.loading === 'true') return;
 
-          if (entry.isIntersecting) {
-            visibleViewers.add(viewer);
-            if (modelSrc && !viewer.hasAttribute('src')) {
-              resetViewerProgress(viewer);
-              viewer.src = modelSrc;
-            }
-            return;
-          }
-
-          visibleViewers.delete(viewer);
-          // On ne décharge plus les modèles une fois chargés : ils restent
-          // affichés quand on défile vers le bas puis qu'on remonte.
+        resetViewerProgress(viewer);
+        viewer.dataset.loading = 'true';
+        ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
+          // Ne jamais remplacer cette URL lors d'un scroll : l'instance 3D,
+          // sa caméra et sa texture restent attachées au même élément.
+          if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
+        }).finally(() => {
+          delete viewer.dataset.loading;
         });
-      }, { rootMargin: '160px 0px', threshold: 0.01 });
+      }
 
       const cards = [];
       creations.forEach((creation, index) => {
         const card = createCard(creation, index);
         cards.push(card);
-
-        const editor = card.querySelector('.character-editor');
-        const textarea = editor ? editor.querySelector('textarea') : null;
-        const counter = editor ? editor.querySelector('.character-count') : null;
-        const status = editor ? editor.querySelector('.save-status') : null;
-        const validateButton = editor ? editor.querySelector('.validate-text') : null;
-        if (textarea && counter && status && validateButton) {
-          textarea.addEventListener('input', () => {
-            counter.textContent = `${textarea.value.length}/240`;
-            status.textContent = '';
-          });
-
-          validateButton.addEventListener('click', () => {
-            const text = textarea.value.trim();
-            localStorage.setItem(editor.dataset.storageKey, text);
-            textarea.value = text;
-            counter.textContent = `${textarea.value.length}/240`;
-            status.textContent = ' • Texte enregistré !';
-            setTimeout(() => { status.textContent = ''; }, 2500);
-          });
-        }
 
         const viewer = card.querySelector('model-viewer');
         if (viewer) {
@@ -632,6 +639,12 @@
               txt.innerText = `${percent}%`;
             });
             viewer.addEventListener('load', hideBar);
+            viewer.addEventListener('model-visibility', (event) => {
+              if (!event.detail.visible) return;
+              // Certains navigateurs suspendent le canvas hors écran. Cette
+              // mise à jour force la réapparition sans recharger le GLB.
+              viewer.requestUpdate?.();
+            });
             viewer.addEventListener('error', () => {
               showBar();
               txt.innerText = 'Touchez pour réessayer';
@@ -641,11 +654,13 @@
               if (!modelSrc) return;
               showBar();
               viewer.removeAttribute('src');
-              requestAnimationFrame(() => { viewer.src = modelSrc; });
+              ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
+                requestAnimationFrame(() => { viewer.src = cachedSrc; });
+              });
             });
           }
 
-          viewerObserver.observe(viewer);
+          ensureViewerLoaded(viewer);
         }
       });
 
@@ -743,9 +758,36 @@
       console.log('%c[Menu] Fixed responsive menu initialized', 'color:#64748b');
     }
 
+    function initLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      if (!lightbox || !lightboxImg) return;
+
+      function close() {
+        lightbox.classList.remove('open');
+        lightboxImg.src = '';
+        document.body.style.overflow = '';
+      }
+
+      document.getElementById('gallery').addEventListener('click', (event) => {
+        const img = event.target.closest('.demarche-img');
+        if (!img) return;
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+
+      lightbox.addEventListener('click', close);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('open')) close();
+      });
+    }
+
     function init() {
       renderGallery();
       initMenu();
+      initLightbox();
       console.log('%c[3D.html] Galerie des créations 3D chargée', 'color:#64748b');
     }
     

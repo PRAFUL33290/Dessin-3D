@@ -5,7 +5,14 @@
 cd "$(dirname "$0")" || exit 1
 
 PORT=8000
-# Trouve un port libre si 8000 est déjà pris
+# Si notre serveur tourne déjà, réutilise exactement la même adresse. Le cache
+# du navigateur est lié au port : ouvrir 8001 créerait un nouveau cache.
+if curl -fs "http://localhost:$PORT/index.html" 2>/dev/null | grep -q "Mon Dessin Devient 3D"; then
+  open "http://localhost:$PORT/index.html"
+  exit 0
+fi
+
+# Trouve un port libre si 8000 est occupé par une autre application.
 while lsof -i :$PORT >/dev/null 2>&1; do
   PORT=$((PORT+1))
 done
