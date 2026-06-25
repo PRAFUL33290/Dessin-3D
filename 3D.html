@@ -960,14 +960,26 @@
         return viewer;
       }
 
-      function loadViewerSrc(viewer, glb) {
+      function loadViewerSrc(viewer, glb, isCurrent) {
         if (!glb) return;
+
+        if (viewer.dataset.modelKey === glb && viewer.hasAttribute('src')) return;
+
+        viewer.dataset.pendingModelKey = glb;
+
+        function applyResolvedSrc(resolvedSrc) {
+          if (isCurrent && !isCurrent()) return;
+          if (viewer.dataset.pendingModelKey !== glb) return;
+          if (viewer.getAttribute('src') !== resolvedSrc) viewer.setAttribute('src', resolvedSrc);
+          viewer.dataset.modelKey = glb;
+        }
+
         if (window.ModelAssetCache && typeof ModelAssetCache.resolve === 'function') {
           ModelAssetCache.resolve(glb).then((cachedSrc) => {
-            if (viewer.getAttribute('src') !== cachedSrc) viewer.setAttribute('src', cachedSrc);
+            applyResolvedSrc(cachedSrc);
           });
-        } else if (viewer.getAttribute('src') !== glb) {
-          viewer.setAttribute('src', glb);
+        } else {
+          applyResolvedSrc(glb);
         }
       }
 
@@ -986,7 +998,7 @@
           });
           viewer.addEventListener('error', () => container.classList.add('error'));
 
-          loadViewerSrc(viewer, container.dataset.glb);
+          loadViewerSrc(viewer, container.dataset.glb, () => true);
         });
       }
 
@@ -1001,6 +1013,7 @@
       let activeContainer = null;
       const visibleContainers = new Set();
       let rafId = null;
+      let scrollIdleTimer = null;
       let lastSwitchAt = 0;
 
       function setActive(container) {
@@ -1021,9 +1034,9 @@
         activeContainer.insertBefore(sharedViewer, activeContainer.firstChild);
 
         const glb = activeContainer.dataset.glb;
-        if (glb && sharedViewer.getAttribute('src') !== glb) {
+        if (glb && sharedViewer.dataset.modelKey !== glb) {
           activeContainer.classList.remove('loaded', 'error');
-          loadViewerSrc(sharedViewer, glb);
+          loadViewerSrc(sharedViewer, glb, () => activeContainer === container);
         } else if (glb) {
           activeContainer.classList.add('loaded');
         }
@@ -1052,7 +1065,7 @@
         if (activeContainer && best !== activeContainer) {
           const elapsed = performance.now() - lastSwitchAt;
           const minimumImprovement = Math.min(120, window.innerHeight * 0.16);
-          if (elapsed < 450 || activeScore - bestScore < minimumImprovement) return;
+          if (elapsed < 700 || activeScore - bestScore < minimumImprovement) return;
         }
 
         if (best) {
@@ -1066,6 +1079,11 @@
           rafId = null;
           chooseBestVisibleContainer();
         });
+      }
+
+      function scheduleChoiceWhenScrollSettles() {
+        clearTimeout(scrollIdleTimer);
+        scrollIdleTimer = setTimeout(scheduleChoice, 140);
       }
 
       sharedViewer.addEventListener('load', () => {
@@ -1089,14 +1107,14 @@
           if (entry.isIntersecting) visibleContainers.add(container);
           else visibleContainers.delete(container);
         });
-        scheduleChoice();
+        scheduleChoiceWhenScrollSettles();
       }, {
-        rootMargin: '24px 0px',
-        threshold: 0.35
+        rootMargin: '120px 0px',
+        threshold: 0.2
       });
 
       containers.forEach((container) => observer.observe(container));
-      window.addEventListener('scroll', scheduleChoice, { passive: true });
+      window.addEventListener('scroll', scheduleChoiceWhenScrollSettles, { passive: true });
       window.addEventListener('resize', scheduleChoice);
       setActive(containers[0]);
     }
