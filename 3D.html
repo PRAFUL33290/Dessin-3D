@@ -163,11 +163,21 @@
       background: #22c55e;
     }
 
-    .demarche-img {
+    .media-frame {
+      position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
-      object-fit: cover;
       border-radius: 14px;
+      overflow: hidden;
+      background: #0f172a;
+    }
+
+    .demarche-img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 0;
       background: #0f172a;
       border: 1px solid #334155;
       cursor: zoom-in;
@@ -203,6 +213,51 @@
       max-height: 100%;
       border-radius: 16px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .zoom-close {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 1205;
+      width: 48px;
+      height: 48px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.92);
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .zoom-action {
+      position: absolute;
+      z-index: 5;
+      right: 10px;
+      bottom: 10px;
+      border: 0;
+      border-radius: 999px;
+      background: #6366f1;
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.35);
+      transition: transform 0.15s, background 0.2s;
+    }
+
+    .zoom-action:hover,
+    .zoom-action:active {
+      background: #4f46e5;
+      transform: scale(1.04);
     }
 
     .empty {
@@ -314,6 +369,14 @@
       display: none;
     }
 
+    .inline-model.manual .inline-model-loader {
+      display: flex;
+    }
+
+    .inline-model.manual .inline-model-hint {
+      display: none;
+    }
+
     .inline-model-spinner {
       width: 38px;
       height: 38px;
@@ -351,6 +414,8 @@
 
     .inline-model-hint {
       bottom: 10px;
+      left: 10px;
+      transform: none;
       display: inline-flex;
       align-items: center;
       gap: 7px;
@@ -361,6 +426,44 @@
       font-size: 0.78rem;
       font-weight: 800;
       box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);
+    }
+
+    .model-zoom-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+      background: #0f172a;
+    }
+
+    .model-zoom-modal.open {
+      display: block;
+    }
+
+    .model-zoom-modal model-viewer {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      background-color: #0f172a;
+      --poster-color: #0f172a;
+    }
+
+    .model-zoom-loader {
+      position: absolute;
+      inset: 0;
+      z-index: 1201;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: #c7d2fe;
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    .model-zoom-loader.hidden {
+      display: none;
     }
   </style>
 </head>
@@ -486,7 +589,28 @@
 
   <!-- LIGHTBOX pour agrandir les dessins -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+    <button id="lightbox-close" class="zoom-close" type="button" aria-label="Dézoomer l'image">
+      <i class="fa-solid fa-compress"></i>
+    </button>
     <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <!-- PLEIN ÉCRAN pour agrandir un modèle 3D sans surcharger la galerie -->
+  <div id="model-zoom" class="model-zoom-modal" role="dialog" aria-modal="true" aria-label="Modèle 3D agrandi">
+    <model-viewer id="model-zoom-viewer"
+                  camera-controls
+                  interaction-prompt="none"
+                  touch-action="pan-y"
+                  shadow-intensity="1"
+                  exposure="1.1">
+    </model-viewer>
+    <div id="model-zoom-loader" class="model-zoom-loader">
+      <div class="inline-model-spinner"></div>
+      <div>Chargement du modèle 3D...</div>
+    </div>
+    <button id="model-zoom-close" class="zoom-close" type="button" aria-label="Dézoomer le modèle 3D">
+      <i class="fa-solid fa-compress"></i>
+    </button>
   </div>
 
   <script src="model-cache.js"></script>
@@ -540,7 +664,8 @@
         enfant: "Léo",
         dessin: "Dessin%20enfants/L%C3%A9o.jpg",
         realiste: "Dessin%20enfants/L%C3%A9o%20R%C3%A9aliste.png",
-        glb: "3D%20MODEL/L%C3%A9o.glb"
+        glb: "3D%20MODEL/L%C3%A9o.glb",
+        autoLoad: false
       }
     ];
 
@@ -565,7 +690,9 @@
         etapes.push(`
           <figure class="demarche-step">
             <div class="step-head"><span class="step-num">1</span> Le dessin</div>
-            <img class="demarche-img" src="${creation.dessin}" loading="lazy" alt="Dessin original${nom}">
+            <div class="media-frame">
+              <img class="demarche-img" src="${creation.dessin}" loading="lazy" alt="Dessin original${nom}">
+            </div>
           </figure>
         `);
       }
@@ -573,7 +700,13 @@
         etapes.push(`
           <figure class="demarche-step">
             <div class="step-head"><span class="step-num">2</span> Mis en forme</div>
-            <img class="demarche-img" src="${creation.realiste}" loading="lazy" alt="Version mise en forme${nom}">
+            <div class="media-frame">
+              <img class="demarche-img" src="${creation.realiste}" loading="lazy" alt="Version mise en forme${nom}">
+              <button class="zoom-action image-zoom-btn" type="button" data-img="${creation.realiste}" data-alt="Version mise en forme${nom}" aria-label="Agrandir la version mise en forme${nom}">
+                <i class="fa-solid fa-expand"></i>
+                <span>Zoom</span>
+              </button>
+            </div>
           </figure>
         `);
       }
@@ -601,6 +734,10 @@
       }
 
       const nom = creation.enfant ? ` de ${escapeHtml(creation.enfant)}` : '';
+      const autoLoad = creation.autoLoad === false ? 'false' : 'true';
+      const loaderText = creation.autoLoad === false
+        ? 'Modèle lourd : zoome pour le charger'
+        : 'Chargement du modèle 3D...';
 
       card.innerHTML = `
         ${creation.enfant ? `<div class="child-name">${creation.enfant}</div>` : ''}
@@ -609,7 +746,7 @@
 
         <div class="model-wrapper">
           ${has3DStep ? `<div class="step-head step-head-3d"><span class="step-num">3</span> En vrai 3D !</div>` : ''}
-          <div class="inline-model" data-glb="${creation.glb}">
+          <div class="inline-model${creation.autoLoad === false ? ' manual' : ''}" data-glb="${creation.glb}" data-auto-load="${autoLoad}">
             <model-viewer
               alt="Modèle 3D${nom}"
               camera-controls
@@ -620,11 +757,15 @@
               exposure="1.1">
             </model-viewer>
             <div class="inline-model-loader" aria-live="polite">
-              <div class="inline-model-spinner"></div>
-              <div>Chargement du modèle 3D...</div>
+              ${creation.autoLoad === false ? '<i class="fa-solid fa-cube text-3xl text-indigo-300"></i>' : '<div class="inline-model-spinner"></div>'}
+              <div>${loaderText}</div>
             </div>
             <div class="inline-model-error">Le modèle n'a pas pu se charger. Recharge la page ou réessaie dans un instant.</div>
             <div class="inline-model-hint"><i class="fa-solid fa-rotate"></i> Fais tourner</div>
+            <button class="zoom-action model-zoom-btn" type="button" data-glb="${creation.glb}" aria-label="Agrandir le modèle 3D${nom}">
+              <i class="fa-solid fa-expand"></i>
+              <span>Zoom</span>
+            </button>
           </div>
         </div>
       `;
@@ -712,6 +853,7 @@
     function initLightbox() {
       const lightbox = document.getElementById('lightbox');
       const lightboxImg = document.getElementById('lightbox-img');
+      const closeBtn = document.getElementById('lightbox-close');
       if (!lightbox || !lightboxImg) return;
 
       function close() {
@@ -721,17 +863,76 @@
       }
 
       document.getElementById('gallery').addEventListener('click', (event) => {
+        const zoomBtn = event.target.closest('.image-zoom-btn');
         const img = event.target.closest('.demarche-img');
-        if (!img) return;
-        lightboxImg.src = img.src;
-        lightboxImg.alt = img.alt;
+        if (!zoomBtn && !img) return;
+
+        lightboxImg.src = zoomBtn ? zoomBtn.dataset.img : img.src;
+        lightboxImg.alt = zoomBtn ? zoomBtn.dataset.alt : img.alt;
         lightbox.classList.add('open');
         document.body.style.overflow = 'hidden';
       });
 
-      lightbox.addEventListener('click', close);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+      lightbox.addEventListener('click', (event) => {
+        if (event.target === lightbox) close();
+      });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && lightbox.classList.contains('open')) close();
+      });
+    }
+
+    function initModelZoom() {
+      const overlay = document.getElementById('model-zoom');
+      const viewer = document.getElementById('model-zoom-viewer');
+      const closeBtn = document.getElementById('model-zoom-close');
+      const loader = document.getElementById('model-zoom-loader');
+      const gallery = document.getElementById('gallery');
+      if (!overlay || !viewer || !closeBtn || !gallery) return;
+
+      function showLoader() {
+        if (loader) loader.classList.remove('hidden');
+      }
+
+      function hideLoader() {
+        if (loader) loader.classList.add('hidden');
+      }
+
+      function open(glb) {
+        if (!glb) return;
+        document.querySelectorAll('.inline-model model-viewer[src]').forEach((inlineViewer) => {
+          inlineViewer.removeAttribute('src');
+          inlineViewer.closest('.inline-model')?.classList.remove('loaded');
+        });
+        viewer.removeAttribute('src');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        showLoader();
+        requestAnimationFrame(() => viewer.setAttribute('src', glb));
+      }
+
+      function close() {
+        overlay.classList.remove('open');
+        viewer.removeAttribute('src');
+        hideLoader();
+        document.body.style.overflow = '';
+      }
+
+      gallery.addEventListener('click', (event) => {
+        const btn = event.target.closest('.model-zoom-btn');
+        if (!btn) return;
+        open(btn.dataset.glb);
+      });
+
+      viewer.addEventListener('load', hideLoader);
+      viewer.addEventListener('progress', (event) => {
+        if (event.detail.totalProgress >= 1) hideLoader();
+      });
+      viewer.addEventListener('error', hideLoader);
+
+      closeBtn.addEventListener('click', close);
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && overlay.classList.contains('open')) close();
       });
     }
 
@@ -765,7 +966,7 @@
       function load(container) {
         const glb = container.dataset.glb;
         const viewer = container.querySelector('model-viewer');
-        if (!glb || !viewer || viewer.hasAttribute('src')) return;
+        if (!glb || !viewer || viewer.hasAttribute('src') || container.dataset.autoLoad === 'false') return;
 
         container.classList.remove('error');
         pruneActiveModels(container);
@@ -789,7 +990,7 @@
       });
 
       if (!('IntersectionObserver' in window)) {
-        containers.slice(0, maxActiveModels).forEach(load);
+        containers.filter((container) => container.dataset.autoLoad !== 'false').slice(0, maxActiveModels).forEach(load);
         return;
       }
 
@@ -808,13 +1009,14 @@
       });
 
       containers.forEach((container) => observer.observe(container));
-      containers.slice(0, maxActiveModels).forEach(load);
+      containers.filter((container) => container.dataset.autoLoad !== 'false').slice(0, maxActiveModels).forEach(load);
     }
 
     function init() {
       renderGallery();
       initMenu();
       initLightbox();
+      initModelZoom();
       initInlineModels();
       console.log('%c[3D.html] Galerie des créations 3D chargée', 'color:#64748b');
     }
