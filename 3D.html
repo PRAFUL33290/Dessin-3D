@@ -369,11 +369,11 @@
       display: none;
     }
 
-    .inline-model.manual .inline-model-loader {
-      display: flex;
+    .inline-model:not(.active) .inline-model-spinner {
+      display: none;
     }
 
-    .inline-model.manual .inline-model-hint {
+    .inline-model:not(.active) .inline-model-hint {
       display: none;
     }
 
@@ -664,8 +664,7 @@
         enfant: "Léo",
         dessin: "Dessin%20enfants/L%C3%A9o.jpg",
         realiste: "Dessin%20enfants/L%C3%A9o%20R%C3%A9aliste.png",
-        glb: "3D%20MODEL/L%C3%A9o.glb",
-        autoLoad: false
+        glb: "3D%20MODEL/L%C3%A9o.glb"
       }
     ];
 
@@ -734,10 +733,6 @@
       }
 
       const nom = creation.enfant ? ` de ${escapeHtml(creation.enfant)}` : '';
-      const autoLoad = creation.autoLoad === false ? 'false' : 'true';
-      const loaderText = creation.autoLoad === false
-        ? 'Modèle lourd : zoome pour le charger'
-        : 'Chargement du modèle 3D...';
 
       card.innerHTML = `
         ${creation.enfant ? `<div class="child-name">${creation.enfant}</div>` : ''}
@@ -746,19 +741,10 @@
 
         <div class="model-wrapper">
           ${has3DStep ? `<div class="step-head step-head-3d"><span class="step-num">3</span> En vrai 3D !</div>` : ''}
-          <div class="inline-model${creation.autoLoad === false ? ' manual' : ''}" data-glb="${creation.glb}" data-auto-load="${autoLoad}">
-            <model-viewer
-              alt="Modèle 3D${nom}"
-              camera-controls
-              disable-pan
-              interaction-prompt="none"
-              touch-action="pan-y"
-              shadow-intensity="1"
-              exposure="1.1">
-            </model-viewer>
+          <div class="inline-model" data-glb="${creation.glb}" data-alt="Modèle 3D${nom}">
             <div class="inline-model-loader" aria-live="polite">
-              ${creation.autoLoad === false ? '<i class="fa-solid fa-cube text-3xl text-indigo-300"></i>' : '<div class="inline-model-spinner"></div>'}
-              <div>${loaderText}</div>
+              <div class="inline-model-spinner"></div>
+              <div class="inline-model-loader-text">Modèle 3D prêt à afficher</div>
             </div>
             <div class="inline-model-error">Le modèle n'a pas pu se charger. Recharge la page ou réessaie dans un instant.</div>
             <div class="inline-model-hint"><i class="fa-solid fa-rotate"></i> Fais tourner</div>
@@ -900,9 +886,8 @@
 
       function open(glb) {
         if (!glb) return;
-        document.querySelectorAll('.inline-model model-viewer[src]').forEach((inlineViewer) => {
-          inlineViewer.removeAttribute('src');
-          inlineViewer.closest('.inline-model')?.classList.remove('loaded');
+        document.querySelectorAll('.inline-model.active').forEach((container) => {
+          container.classList.remove('active', 'loaded');
         });
         viewer.removeAttribute('src');
         overlay.classList.add('open');
@@ -940,76 +925,103 @@
       const containers = Array.from(document.querySelectorAll('.inline-model'));
       if (containers.length === 0) return;
 
-      const active = new Set();
-      const maxActiveModels = window.matchMedia('(max-width: 720px)').matches ? 2 : 4;
+      const sharedViewer = document.createElement('model-viewer');
+      sharedViewer.setAttribute('camera-controls', '');
+      sharedViewer.setAttribute('disable-pan', '');
+      sharedViewer.setAttribute('interaction-prompt', 'none');
+      sharedViewer.setAttribute('touch-action', 'pan-y');
+      sharedViewer.setAttribute('shadow-intensity', '1');
+      sharedViewer.setAttribute('exposure', '1.1');
 
-      function setLoaded(container, loaded) {
-        container.classList.toggle('loaded', loaded);
-      }
+      let activeContainer = null;
+      const visibleContainers = new Set();
+      let rafId = null;
 
-      function release(container) {
-        const viewer = container.querySelector('model-viewer');
-        active.delete(container);
-        if (!viewer) return;
-        if (viewer.hasAttribute('src')) viewer.removeAttribute('src');
-        setLoaded(container, false);
-      }
+      function setActive(container) {
+        if (!container || activeContainer === container) return;
 
-      function pruneActiveModels(nextContainer) {
-        const activeList = Array.from(active).filter((container) => container !== nextContainer);
-        while (active.size >= maxActiveModels && activeList.length > 0) {
-          const candidate = activeList.shift();
-          release(candidate);
+        if (activeContainer) {
+          activeContainer.classList.remove('active', 'loaded', 'error');
+          const previousText = activeContainer.querySelector('.inline-model-loader-text');
+          if (previousText) previousText.textContent = 'Modèle 3D prêt à afficher';
+        }
+
+        activeContainer = container;
+        activeContainer.classList.add('active');
+        const loaderText = activeContainer.querySelector('.inline-model-loader-text');
+        if (loaderText) loaderText.textContent = 'Chargement du modèle 3D...';
+        sharedViewer.setAttribute('alt', activeContainer.dataset.alt || 'Modèle 3D');
+        activeContainer.insertBefore(sharedViewer, activeContainer.firstChild);
+
+        const glb = activeContainer.dataset.glb;
+        if (glb && sharedViewer.getAttribute('src') !== glb) {
+          activeContainer.classList.remove('loaded', 'error');
+          sharedViewer.setAttribute('src', glb);
+        } else if (glb) {
+          activeContainer.classList.add('loaded');
         }
       }
 
-      function load(container) {
-        const glb = container.dataset.glb;
-        const viewer = container.querySelector('model-viewer');
-        if (!glb || !viewer || viewer.hasAttribute('src') || container.dataset.autoLoad === 'false') return;
+      function chooseBestVisibleContainer() {
+        let best = null;
+        let bestScore = Infinity;
+        const viewportCenter = window.innerHeight / 2;
 
-        container.classList.remove('error');
-        pruneActiveModels(container);
-        active.add(container);
+        visibleContainers.forEach((container) => {
+          const rect = container.getBoundingClientRect();
+          if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
+          const center = rect.top + rect.height / 2;
+          const score = Math.abs(center - viewportCenter);
+          if (score < bestScore) {
+            best = container;
+            bestScore = score;
+          }
+        });
 
-        viewer.setAttribute('src', glb);
+        if (best) {
+          setActive(best);
+        }
       }
 
-      containers.forEach((container) => {
-        const viewer = container.querySelector('model-viewer');
-        if (!viewer) return;
+      function scheduleChoice() {
+        if (rafId) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          chooseBestVisibleContainer();
+        });
+      }
 
-        viewer.addEventListener('load', () => setLoaded(container, true));
-        viewer.addEventListener('progress', (event) => {
-          if (event.detail.totalProgress >= 1) setLoaded(container, true);
-        });
-        viewer.addEventListener('error', () => {
-          active.delete(container);
-          container.classList.add('error');
-        });
+      sharedViewer.addEventListener('load', () => {
+        if (activeContainer) activeContainer.classList.add('loaded');
+      });
+      sharedViewer.addEventListener('progress', (event) => {
+        if (event.detail.totalProgress >= 1 && activeContainer) activeContainer.classList.add('loaded');
+      });
+      sharedViewer.addEventListener('error', () => {
+        if (activeContainer) activeContainer.classList.add('error');
       });
 
       if (!('IntersectionObserver' in window)) {
-        containers.filter((container) => container.dataset.autoLoad !== 'false').slice(0, maxActiveModels).forEach(load);
+        setActive(containers[0]);
         return;
       }
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           const container = entry.target;
-          if (entry.isIntersecting) {
-            load(container);
-          } else if (entry.boundingClientRect.top < -window.innerHeight || entry.boundingClientRect.top > window.innerHeight * 2) {
-            release(container);
-          }
+          if (entry.isIntersecting) visibleContainers.add(container);
+          else visibleContainers.delete(container);
         });
+        scheduleChoice();
       }, {
-        rootMargin: '280px 0px',
-        threshold: 0.01
+        rootMargin: '120px 0px',
+        threshold: 0.12
       });
 
       containers.forEach((container) => observer.observe(container));
-      containers.filter((container) => container.dataset.autoLoad !== 'false').slice(0, maxActiveModels).forEach(load);
+      window.addEventListener('scroll', scheduleChoice, { passive: true });
+      window.addEventListener('resize', scheduleChoice);
+      setActive(containers[0]);
     }
 
     function init() {
