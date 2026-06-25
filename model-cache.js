@@ -38,6 +38,15 @@
               // téléchargement : on garde tout de même la réponse en mémoire.
               console.warn(`[3D cache] Stockage persistant indisponible pour ${source}`, cacheError);
             }
+          } else if (!(await isUsableModelResponse(response, absoluteUrl))) {
+            await cache.delete(absoluteUrl);
+            response = await fetchWithTimeout(absoluteUrl, 20000);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            try {
+              await cache.put(absoluteUrl, response.clone());
+            } catch (cacheError) {
+              console.warn(`[3D cache] Stockage persistant indisponible pour ${source}`, cacheError);
+            }
           }
         } else {
           response = await fetchWithTimeout(absoluteUrl, 20000);
@@ -59,5 +68,38 @@
     return pending;
   }
 
-  window.ModelAssetCache = { resolve };
+  async function isUsableModelResponse(response, absoluteUrl) {
+    try {
+      const blob = await response.clone().blob();
+      if (blob.size < 1024) return false;
+      if (!/\.glb(?:[?#].*)?$/i.test(absoluteUrl)) return true;
+
+      const header = new Uint8Array(await blob.slice(0, 4).arrayBuffer());
+      return header[0] === 0x67 && header[1] === 0x6c && header[2] === 0x54 && header[3] === 0x46;
+    } catch (error) {
+      console.warn(`[3D cache] Réponse cache illisible pour ${absoluteUrl}`, error);
+      return false;
+    }
+  }
+
+  async function invalidate(source) {
+    if (!source) return;
+
+    const absoluteUrl = new URL(source, document.baseURI).href;
+    const objectUrl = objectUrls.get(absoluteUrl);
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    objectUrls.delete(absoluteUrl);
+    pendingUrls.delete(absoluteUrl);
+
+    if ('caches' in window) {
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.delete(absoluteUrl);
+      } catch (error) {
+        console.warn(`[3D cache] Impossible d'effacer ${source} du cache`, error);
+      }
+    }
+  }
+
+  window.ModelAssetCache = { resolve, invalidate };
 })();

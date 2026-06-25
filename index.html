@@ -633,12 +633,27 @@
 
       // 'load' fires reliably when the model is fully ready
       viewer.addEventListener('load', hideOverlay);
+      viewer.addEventListener('error', () => {
+        if (viewer.dataset.directFallbackUsed === 'true') {
+          hideOverlay();
+          return;
+        }
+
+        viewer.dataset.directFallbackUsed = 'true';
+        if (window.ModelAssetCache && typeof ModelAssetCache.invalidate === 'function') {
+          ModelAssetCache.invalidate(modelSrc);
+        }
+        requestAnimationFrame(() => viewer.setAttribute('src', modelSrc));
+      });
 
       // Le fichier est conservé dans le cache persistant du navigateur. L'URL
       // blob reste ensuite identique pendant toute la visite, même hors écran.
       const modelSrc = viewer.dataset.src;
       if (modelSrc) {
-        ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
+        const resolver = window.ModelAssetCache && typeof ModelAssetCache.resolve === 'function'
+          ? ModelAssetCache.resolve(modelSrc)
+          : Promise.resolve(modelSrc);
+        resolver.then((cachedSrc) => {
           if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
         });
       }
@@ -658,10 +673,26 @@
       }
 
       viewer.addEventListener('load', revealHeroModel, { once: true });
+      viewer.addEventListener('error', () => {
+        const modelSrc = viewer.dataset.src;
+        if (!modelSrc || viewer.dataset.directFallbackUsed === 'true') {
+          revealHeroModel();
+          return;
+        }
+
+        viewer.dataset.directFallbackUsed = 'true';
+        if (window.ModelAssetCache && typeof ModelAssetCache.invalidate === 'function') {
+          ModelAssetCache.invalidate(modelSrc);
+        }
+        requestAnimationFrame(() => viewer.setAttribute('src', modelSrc));
+      });
 
       const modelSrc = viewer.dataset.src;
       if (modelSrc) {
-        ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
+        const resolver = window.ModelAssetCache && typeof ModelAssetCache.resolve === 'function'
+          ? ModelAssetCache.resolve(modelSrc)
+          : Promise.resolve(modelSrc);
+        resolver.then((cachedSrc) => {
           if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
         });
       }

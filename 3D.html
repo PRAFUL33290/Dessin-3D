@@ -886,6 +886,42 @@
       });
     }
 
+    function setCachedModelSrc(viewer, glb, isCurrent) {
+      if (!viewer || !glb) return;
+      if (viewer.dataset.modelKey === glb && viewer.hasAttribute('src')) return;
+
+      viewer.dataset.pendingModelKey = glb;
+      viewer.dataset.sourceModel = glb;
+      viewer.dataset.directFallbackUsed = 'false';
+
+      function applyResolvedSrc(resolvedSrc) {
+        if (isCurrent && !isCurrent()) return;
+        if (viewer.dataset.pendingModelKey !== glb) return;
+        if (viewer.getAttribute('src') !== resolvedSrc) viewer.setAttribute('src', resolvedSrc);
+        viewer.dataset.modelKey = glb;
+      }
+
+      if (window.ModelAssetCache && typeof ModelAssetCache.resolve === 'function') {
+        ModelAssetCache.resolve(glb).then(applyResolvedSrc);
+      } else {
+        applyResolvedSrc(glb);
+      }
+    }
+
+    function retryModelDirectly(viewer, onFinalError) {
+      const glb = viewer && viewer.dataset.sourceModel;
+      if (!viewer || !glb || viewer.dataset.directFallbackUsed === 'true') {
+        if (onFinalError) onFinalError();
+        return;
+      }
+
+      viewer.dataset.directFallbackUsed = 'true';
+      if (window.ModelAssetCache && typeof ModelAssetCache.invalidate === 'function') {
+        ModelAssetCache.invalidate(glb);
+      }
+      requestAnimationFrame(() => viewer.setAttribute('src', glb));
+    }
+
     function initModelZoom() {
       const overlay = document.getElementById('model-zoom');
       const viewer = document.getElementById('model-zoom-viewer');
@@ -908,8 +944,7 @@
         document.body.style.overflow = 'hidden';
         showLoader();
         if (viewer.dataset.modelKey !== glb || !viewer.hasAttribute('src')) {
-          viewer.dataset.modelKey = glb;
-          requestAnimationFrame(() => viewer.setAttribute('src', glb));
+          setCachedModelSrc(viewer, glb, () => overlay.classList.contains('open'));
         } else {
           hideLoader();
         }
@@ -931,7 +966,7 @@
       viewer.addEventListener('progress', (event) => {
         if (event.detail.totalProgress >= 1) hideLoader();
       });
-      viewer.addEventListener('error', hideLoader);
+      viewer.addEventListener('error', () => retryModelDirectly(viewer, hideLoader));
 
       closeBtn.addEventListener('click', close);
       document.addEventListener('keydown', (event) => {
@@ -960,53 +995,6 @@
         return viewer;
       }
 
-      function loadViewerSrc(viewer, glb, isCurrent) {
-        if (!glb) return;
-
-        if (viewer.dataset.modelKey === glb && viewer.hasAttribute('src')) return;
-
-        viewer.dataset.pendingModelKey = glb;
-
-        function applyResolvedSrc(resolvedSrc) {
-          if (isCurrent && !isCurrent()) return;
-          if (viewer.dataset.pendingModelKey !== glb) return;
-          if (viewer.getAttribute('src') !== resolvedSrc) viewer.setAttribute('src', resolvedSrc);
-          viewer.dataset.modelKey = glb;
-        }
-
-        if (window.ModelAssetCache && typeof ModelAssetCache.resolve === 'function') {
-          ModelAssetCache.resolve(glb).then((cachedSrc) => {
-            applyResolvedSrc(cachedSrc);
-          });
-        } else {
-          applyResolvedSrc(glb);
-        }
-      }
-
-      function initDesktopInlineModels() {
-        containers.forEach((container) => {
-          const loaderText = container.querySelector('.inline-model-loader-text');
-          if (loaderText) loaderText.textContent = 'Chargement du modèle 3D...';
-
-          const viewer = createInlineViewer(container);
-          container.classList.add('active');
-          container.insertBefore(viewer, container.firstChild);
-
-          viewer.addEventListener('load', () => container.classList.add('loaded'));
-          viewer.addEventListener('progress', (event) => {
-            if (event.detail.totalProgress >= 1) container.classList.add('loaded');
-          });
-          viewer.addEventListener('error', () => container.classList.add('error'));
-
-          loadViewerSrc(viewer, container.dataset.glb, () => true);
-        });
-      }
-
-      if (window.matchMedia('(min-width: 1024px)').matches) {
-        initDesktopInlineModels();
-        return;
-      }
-
       function ensureInlineViewer(container) {
         if (!container || container.dataset.viewerReady === 'true') return;
 
@@ -1026,9 +1014,11 @@
         viewer.addEventListener('progress', (event) => {
           if (event.detail.totalProgress >= 1) container.classList.add('loaded');
         });
-        viewer.addEventListener('error', () => container.classList.add('error'));
+        viewer.addEventListener('error', () => {
+          retryModelDirectly(viewer, () => container.classList.add('error'));
+        });
 
-        loadViewerSrc(viewer, glb, () => container.isConnected);
+        setCachedModelSrc(viewer, glb, () => container.isConnected);
       }
 
       if (!('IntersectionObserver' in window)) {
