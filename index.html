@@ -222,6 +222,9 @@
         <a href="index.html" class="flex items-center gap-x-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-2xl transition-colors" aria-current="page">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
         </a>
+        <a href="aide-activite.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><span>Aide à l'activité</span>
+        </a>
         <a href="3D.html" class="flex items-center gap-x-2 px-5 py-2 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 transition-all hover:scale-105 transform">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
           <span>Le Musée 3D</span>
@@ -262,6 +265,9 @@
       <div class="flex flex-col py-2 text-lg">
         <a href="index.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-indigo-700 bg-indigo-50 font-semibold" aria-current="page">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
+        </a>
+        <a href="aide-activite.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><span>Aide à l'activité</span>
         </a>
         <div class="px-6 pt-3">
           <a href="3D.html" class="drawer-link flex items-center justify-center gap-x-3 px-6 py-3.5 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 font-semibold transition-colors">
@@ -501,423 +507,28 @@
     </div>
   </div>
 
-  <!-- MISSION -->
-  <div class="max-w-4xl mx-auto px-6 pt-12">
-    <h2 class="kid-title text-3xl font-extrabold mb-4 text-center">Que veux-tu dessiner ?</h2>
-    <p class="text-center text-slate-600 mb-6">Dessine au choix :</p>
-    
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-center">
-      <div class="bg-white py-3 px-5 rounded-2xl border text-lg">Un personnage</div>
-      <div class="bg-white py-3 px-5 rounded-2xl border text-lg">Un animal</div>
-      <div class="bg-white py-3 px-5 rounded-2xl border text-lg">Un objet magique</div>
-      <div class="bg-white py-3 px-5 rounded-2xl border text-lg">Un véhicule</div>
-      <div class="bg-white py-3 px-5 rounded-2xl border text-lg">Une créature fantastique</div>
-      <div class="bg-white py-3 px-5 rounded-2xl border text-lg">Une maison ou une planète</div>
-    </div>
-  </div>
-
-  <!-- IDÉES -->
-  <div id="idees" class="max-w-5xl mx-auto px-6 pt-16 pb-6">
-    <div class="text-center mb-10">
-      <h2 class="kid-title section-header text-slate-900 mb-3">Quelques idées pour t'inspirer 💡</h2>
-      <p class="text-slate-600 max-w-lg mx-auto text-lg">Clique sur un modèle pour le voir en grand, l'imprimer et le colorier chez toi !</p>
-    </div>
-
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-      <!-- Card 1 -->
-      <div onclick="openDrawingModal('images/superhero.svg', '🦸', 'Super-héros')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/superhero.svg" alt="Super-héros" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🦸</span>
-          <span class="font-bold text-slate-700 text-sm">Super-héros</span>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div onclick="openDrawingModal('images/chat_aile.svg', '🐱', 'Chat ailé')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/chat_aile.svg" alt="Chat ailé" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🐱</span>
-          <span class="font-bold text-slate-700 text-sm">Chat ailé</span>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div onclick="openDrawingModal('images/voiture_volante.svg', '🚀', 'Voiture volante')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/voiture_volante.svg" alt="Voiture volante" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🚀</span>
-          <span class="font-bold text-slate-700 text-sm">Voiture volante</span>
-        </div>
-      </div>
-
-      <!-- Card 4 -->
-      <div onclick="openDrawingModal('images/dragon.svg', '🐉', 'Dragon')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/dragon.svg" alt="Dragon" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🐉</span>
-          <span class="font-bold text-slate-700 text-sm">Dragon</span>
-        </div>
-      </div>
-
-      <!-- Card 5 -->
-      <div onclick="openDrawingModal('images/requin_licorne.svg', '🦄', 'Requin licorne')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/requin_licorne.svg" alt="Requin licorne" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🦄</span>
-          <span class="font-bold text-slate-700 text-sm">Requin licorne</span>
-        </div>
-      </div>
-
-      <!-- Card 6 -->
-      <div onclick="openDrawingModal('images/baguette_magique.svg', '🪄', 'Baguette magique')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/baguette_magique.svg" alt="Baguette magique" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🪄</span>
-          <span class="font-bold text-slate-700 text-sm">Baguette magique</span>
-        </div>
-      </div>
-
-      <!-- Card 7 -->
-      <div onclick="openDrawingModal('images/couronne_magique.svg', '👑', 'Couronne magique')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/couronne_magique.svg" alt="Couronne magique" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">👑</span>
-          <span class="font-bold text-slate-700 text-sm">Couronne magique</span>
-        </div>
-      </div>
-
-      <!-- Card 8 -->
-      <div onclick="openDrawingModal('images/pizza_robot.svg', '🍕', 'Pizza robot')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/pizza_robot.svg" alt="Pizza robot" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🍕</span>
-          <span class="font-bold text-slate-700 text-sm">Pizza robot</span>
-        </div>
-      </div>
-
-      <!-- Card 9 -->
-      <div onclick="openDrawingModal('images/chateau_sous_la_mer.svg', '🏰', 'Château sous la mer')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/chateau_sous_la_mer.svg" alt="Château sous la mer" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🏰</span>
-          <span class="font-bold text-slate-700 text-sm">Château sous la mer</span>
-        </div>
-      </div>
-
-      <!-- Card 10 -->
-      <div onclick="openDrawingModal('images/robot_gentil.svg', '🤖', 'Robot gentil')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/robot_gentil.svg" alt="Robot gentil" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🤖</span>
-          <span class="font-bold text-slate-700 text-sm">Robot gentil</span>
-        </div>
-      </div>
-
-      <!-- Card 11 -->
-      <div onclick="openDrawingModal('images/montgolfiere_magique.svg', '🎈', 'Montgolfière magique')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/montgolfiere_magique.svg" alt="Montgolfière magique" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🎈</span>
-          <span class="font-bold text-slate-700 text-sm">Montgolfière magique</span>
-        </div>
-      </div>
-
-      <!-- Card 12 -->
-      <div onclick="openDrawingModal('images/donut_robot.svg', '🍩', 'Donut robot')" 
-           class="idea-chip bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col cursor-pointer">
-        <div class="h-36 bg-slate-50/50 flex items-center justify-center p-4 border-b border-slate-100 relative">
-          <img src="images/donut_robot.svg" alt="Donut robot" class="max-h-full max-w-full transition-transform duration-200" />
-          
-        </div>
-        <div class="p-3 text-center bg-white flex items-center justify-center gap-x-2">
-          <span class="text-xl">🍩</span>
-          <span class="font-bold text-slate-700 text-sm">Donut robot</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-10 text-center bg-indigo-50 border border-indigo-100/60 rounded-3xl py-4 px-6 max-w-2xl mx-auto shadow-sm">
-      <p class="text-indigo-800 font-semibold flex items-center justify-center gap-x-2 text-base">
-        <span>💡</span>
-        <span>Astuce : Tu peux aussi mélanger les idées (ex: panda ninja, chat astronaute…) !</span>
-      </p>
-    </div>
-  </div>
-
-  <!-- ÉTAPES DÉTAILLÉES -->
-  <div class="max-w-4xl mx-auto px-6 pt-12">
-    <h2 class="kid-title section-header text-center mb-6">Les étapes de l’activité</h2>
-    
-    <div class="space-y-3 max-w-2xl mx-auto">
-      <div class="flex gap-4 items-start bg-white border rounded-2xl p-5">
-        <div class="step-number">1</div>
-        <div>
-          <div class="font-bold">Choisis ton idée</div>
-          <div class="text-slate-600 text-sm">Regarde les propositions ou invente la tienne.</div>
-        </div>
-      </div>
-      <div class="flex gap-4 items-start bg-white border rounded-2xl p-5">
-        <div class="step-number">2</div>
-        <div>
-          <div class="font-bold">Dessine sur une feuille de papier</div>
-          <div class="text-slate-600 text-sm">Ajoute plein de couleurs ! Plus c’est détaillé, plus la 3D sera belle.</div>
-        </div>
-      </div>
-      <div class="flex gap-4 items-start bg-white border rounded-2xl p-5">
-        <div class="step-number">3</div>
-        <div>
-          <div class="font-bold">Donne un nom et explique ta création</div>
-          <div class="text-slate-600 text-sm">Note le nom, ce que c’est et son pouvoir sur ta feuille.</div>
-        </div>
-      </div>
-      <div class="flex gap-4 items-start bg-white border rounded-2xl p-5">
-        <div class="step-number">4</div>
-        <div>
-          <div class="font-bold">L’animateur prend une photo</div>
-          <div class="text-slate-600 text-sm">Ton dessin sera envoyé dans Meshy AI pour devenir une vraie sculpture 3D.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL FOR DRAWING DETAILS -->
-  <div id="drawing-modal" class="hidden fixed inset-0 z-[200] items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <!-- Backdrop Close Trigger -->
-    <div onclick="closeDrawingModal()" class="absolute inset-0"></div>
-    
-    <!-- Modal Content Panel -->
-    <div id="modal-panel" class="relative bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl flex flex-col transform scale-95 opacity-0 transition-all duration-200 ease-out">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-        <div class="flex items-center gap-x-2.5">
-          <span id="modal-emoji" class="text-2xl">🦸</span>
-          <h4 id="modal-title" class="font-bold text-xl text-slate-800">Super-héros</h4>
-        </div>
-        <button onclick="closeDrawingModal()" class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 text-2xl transition-colors">
-          &times;
-        </button>
-      </div>
-      
-      <!-- Modal Body (The Drawing SVG) -->
-      <div class="h-80 bg-slate-50/50 flex items-center justify-center p-8 border-b border-slate-100">
-        <img id="modal-img" src="" alt="Modèle de dessin" class="max-h-full max-w-full drop-shadow-sm select-none" />
-      </div>
-      
-      <!-- Modal Footer -->
-      <div class="p-4 bg-slate-50 flex flex-col sm:flex-row gap-2 justify-end">
-        <button onclick="closeDrawingModal()" 
-                class="px-5 py-2.5 text-slate-600 hover:text-slate-800 font-medium rounded-2xl hover:bg-slate-100 transition-colors text-sm">
-          Fermer
-        </button>
-        <button id="modal-print-btn" onclick="triggerPrint()" 
-                class="flex items-center justify-center gap-x-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/15 transition-all text-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          <span>Imprimer pour colorier</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- FOOTER -->
-  <footer class="border-t bg-white py-8 text-center text-sm text-slate-400">
-    <div class="max-w-4xl mx-auto px-6">
-      <p class="font-medium">Le Musée des Créations du Futur</p>
-      <p class="mt-1 text-xs">Chaque enfant pourra voir son dessin original + sa version en 3D</p>
-      <a href="3D.html" class="inline-block mt-4 text-indigo-600 hover:text-indigo-700 text-sm font-semibold">
-        Voir les créations en 3D →
-      </a>
+  <footer class="border-t border-slate-200 bg-white py-10 text-center">
+    <div class="max-w-3xl mx-auto px-6">
+      <p class="text-lg font-extrabold text-indigo-700">Création par Julien Guerrier ✨</p>
+      <p class="mt-3 text-sm text-slate-500 leading-relaxed">
+        Ce site web, développé avec soin, utilise WordPress, HTML, CSS et JavaScript pour offrir une expérience fluide et responsive, optimisée pour mobile et desktop.
+      </p>
+      <p class="mt-3 text-xs text-slate-400">
+        Julien Animateur — Animateur élémentaire / maternelle • Arc en ciel • Bruges
+      </p>
+      <div class="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-slate-400">
+        <a href="https://julien-animateur.fr/mentions-legales/" target="_blank" rel="noopener" class="hover:text-indigo-600 transition-colors">Mentions légales</a>
+        <span>•</span>
+        <a href="https://julien-animateur.fr/politique-de-confidentialite/" target="_blank" rel="noopener" class="hover:text-indigo-600 transition-colors">Politique de confidentialité</a>
+        <span>•</span>
+        <span>© 2025 Tous droits réservés</span>
+      </div>
     </div>
   </footer>
 
   <script src="model-cache.js"></script>
   <script>
-    let currentSvgPath = "";
-    let currentTitle = "";
-
-    function openDrawingModal(svgPath, emoji, title) {
-      currentSvgPath = svgPath;
-      currentTitle = title;
-      
-      const modal = document.getElementById('drawing-modal');
-      const panel = document.getElementById('modal-panel');
-      const modalImg = document.getElementById('modal-img');
-      const modalEmoji = document.getElementById('modal-emoji');
-      const modalTitle = document.getElementById('modal-title');
-      
-      modalImg.src = svgPath;
-      modalEmoji.innerText = emoji;
-      modalTitle.innerText = title;
-      
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      
-      // Trigger animation after layout render
-      setTimeout(() => {
-        panel.classList.remove('scale-95', 'opacity-0');
-        panel.classList.add('scale-100', 'opacity-100');
-      }, 20);
-      
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeDrawingModal() {
-      const modal = document.getElementById('drawing-modal');
-      const panel = document.getElementById('modal-panel');
-      
-      panel.classList.remove('scale-100', 'opacity-100');
-      panel.classList.add('scale-95', 'opacity-0');
-      
-      setTimeout(() => {
-        modal.classList.remove('flex');
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-      }, 200);
-    }
-
-    function triggerPrint() {
-      if (currentSvgPath && currentTitle) {
-        printDrawing(currentSvgPath, currentTitle);
-      }
-    }
-
-    function printDrawing(svgPath, title) {
-      // Create a hidden iframe for printing to avoid printing the entire webpage
-      let iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.right = '0';
-      iframe.style.bottom = '0';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = '0';
-      document.body.appendChild(iframe);
-
-      // Resolve the image path relative to the current page so it works both
-      // locally (site at root) and on GitHub Pages (served from /Dessin-3D/).
-      const printImgSrc = new URL(svgPath, window.location.href).href;
-
-      // Write printable layout to the iframe
-      iframe.contentWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Coloriage - ${title}</title>
-          <style>
-            body {
-              margin: 0;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              font-family: system-ui, -apple-system, sans-serif;
-              box-sizing: border-box;
-              padding: 20px;
-            }
-            .container {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              width: 100%;
-              height: 100%;
-              text-align: center;
-            }
-            img {
-              width: 85%;
-              height: 75vh;
-              object-fit: contain;
-            }
-            h1 {
-              margin-top: 15px;
-              color: #1e293b;
-              font-size: 20px;
-              border-top: 2px dashed #cbd5e1;
-              padding-top: 15px;
-              width: 80%;
-            }
-            @media print {
-              @page {
-                size: portrait;
-                margin: 1cm;
-              }
-              body {
-                padding: 0;
-              }
-              h1 {
-                font-size: 16px;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <img src="${printImgSrc}" />
-            <h1>🎨 Mon Dessin Devient 3D • Coloriage : ${title}</h1>
-          </div>
-          <script>
-            window.onload = function() {
-              setTimeout(function() {
-                window.focus();
-                window.print();
-                setTimeout(function() {
-                  window.frameElement.remove();
-                }, 100);
-              }, 400);
-            };
-          </" + "script>
-        </body>
-        </html>
-      `);
-      iframe.contentWindow.document.close();
-    }
-
     function initMenu() {
       const burger = document.getElementById('burger-btn');
       const drawer = document.getElementById('mobile-drawer');
