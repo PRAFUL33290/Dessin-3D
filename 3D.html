@@ -658,10 +658,30 @@
         ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
           // Ne jamais remplacer cette URL lors d'un scroll : l'instance 3D,
           // sa caméra et sa texture restent attachées au même élément.
-          if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
+          if (viewer.hasAttribute('src')) return;
+          viewer.src = cachedSrc;
+          watchForStall(viewer, cachedSrc);
         }).finally(() => {
           delete viewer.dataset.loading;
         });
+      }
+      // Sur iOS, recharger un modèle après l'avoir déchargé peut rester bloqué
+      // à 0 % : Safari a suspendu le canvas hors écran ou l'événement « load »
+      // est perdu sous la pression mémoire. On surveille donc : si le modèle
+      // n'est toujours pas chargé après quelques secondes, on relance une fois
+      // le chargement depuis le cache (instantané, sans re-téléchargement).
+      function watchForStall(viewer, cachedSrc) {
+        clearTimeout(viewer._stallTimer);
+        viewer._stallTimer = setTimeout(() => {
+          if (viewer.loaded) return;          // chargé : rien à faire
+          if (viewer._stallRetried) return;   // déjà relancé une fois
+          viewer._stallRetried = true;
+          viewer.removeAttribute('src');
+          resetViewerProgress(viewer);
+          requestAnimationFrame(() => {
+            if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
+          });
+        }, 5000);
       }
       function unloadViewer(viewer) {
         // Libère la mémoire GPU d'un modèle loin hors écran. Sur iOS, garder
@@ -670,6 +690,8 @@
         // instantané, donc l'utilisateur ne voit jamais le modèle disparaître.
         if (viewer.dataset.loading === 'true') return; // chargement en cours : on laisse finir
         if (!viewer.hasAttribute('src')) return;       // déjà déchargé
+        clearTimeout(viewer._stallTimer);              // évite un rechargement parasite
+        viewer._stallRetried = false;                  // budget de relance neuf au prochain affichage
         viewer.removeAttribute('src');
         resetViewerProgress(viewer);
       }
@@ -704,7 +726,13 @@
               updateBar.style.width = `${percent}%`;
               txt.innerText = `${percent}%`;
             });
-            viewer.addEventListener('load', hideBar);
+            viewer.addEventListener('load', () => {
+              // Chargement réussi : on annule le watchdog et on redonne un
+              // budget de relance neuf pour le prochain cycle décharge/recharge.
+              clearTimeout(viewer._stallTimer);
+              viewer._stallRetried = false;
+              hideBar();
+            });
             viewer.addEventListener('model-visibility', (event) => {
               if (!event.detail.visible) return;
               // Certains navigateurs suspendent le canvas hors écran. Cette
