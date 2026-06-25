@@ -22,6 +22,12 @@
       background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
     }
 
+    .hero-bg-blend {
+      background:
+        linear-gradient(135deg, rgba(99,102,241,0.82) 0%, rgba(168,85,247,0.72) 50%, rgba(236,72,153,0.82) 100%),
+        url('images/Background%20Hero-Section.png') center / cover no-repeat;
+    }
+
     .section-header {
       font-size: 2rem;
       line-height: 2.25rem;
@@ -59,21 +65,22 @@
       padding-top: 4rem;
     }
 
-    /* HERO 3D model : décalage bas qui remonte pour donner de la profondeur */
+    /* HERO 3D model : entrée + flottement doux en boucle */
     .hero-model {
-      animation: heroRise 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: heroRise 1.3s cubic-bezier(0.16, 1, 0.3, 1) both,
+                 heroFloat 4s ease-in-out 1.3s infinite;
     }
 
     @keyframes heroRise {
-      from {
-        transform: translateY(60px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+      from { transform: translateY(60px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
     }
+
+    @keyframes heroFloat {
+      0%, 100% { transform: translateY(0px); }
+      50%      { transform: translateY(-12px); }
+    }
+
 
     /* model-viewer sans bordure ni ombre de focus */
     model-viewer#hero-viewer:focus,
@@ -163,7 +170,38 @@
       50%      { transform: translate(12px, 14px); }
     }
 
+    /* Indice de rotation : la main glisse de gauche à droite */
+    .swipe-hint {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .swipe-chev {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .swipe-hand {
+      font-size: 15px;
+      line-height: 1;
+      animation: swipeHand 2s ease-in-out infinite;
+    }
+    @keyframes swipeHand {
+      0%, 100% { transform: translateX(-6px) rotate(-12deg); }
+      50%      { transform: translateX(6px)  rotate(12deg); }
+    }
+
+    /* Modèle 3D plus grand et remonté sur mobile */
+    @media (max-width: 767px) {
+      #hero-viewer {
+        height: 128% !important;
+        bottom: -1% !important;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
+      .swipe-hand { animation: none; }
       .hero-bg .halo,
       .hero-bg .float { animation: none; }
     }
@@ -175,9 +213,7 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <!-- Logo + Title -->
       <a href="index.html" class="flex items-center gap-x-3">
-        <div class="w-10 h-10 rounded-2xl fun-gradient flex items-center justify-center text-white text-3xl shadow">
-          🎨
-        </div>
+        <img src="Logo.png" alt="Logo Mon Dessin Devient 3D" class="h-10 w-auto object-contain" />
         <div class="kid-title font-extrabold text-2xl md:text-3xl tracking-tighter text-indigo-700">Mon Dessin Devient 3D</div>
       </a>
 
@@ -214,7 +250,7 @@
       <!-- Drawer Header -->
       <div class="flex items-center justify-between px-5 h-16 border-b">
         <div class="flex items-center gap-x-3">
-          <div class="w-8 h-8 rounded-xl fun-gradient flex items-center justify-center text-white text-xl">🎨</div>
+          <img src="Logo.png" alt="Logo" class="h-8 w-auto object-contain" />
           <span class="font-extrabold text-indigo-700">Menu</span>
         </div>
         <button id="drawer-close" class="w-9 h-9 flex items-center justify-center text-2xl text-slate-400 hover:text-slate-700">
@@ -242,31 +278,36 @@
   </div>
 
   <!-- HERO -->
-  <header class="fun-gradient text-white relative overflow-x-clip">
+  <header class="hero-bg-blend text-white relative overflow-x-clip">
     <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 items-center gap-6 md:gap-8 min-h-[520px]">
 
       <!-- GAUCHE : titre + slogan + bouton -->
-      <div class="text-center md:text-left pt-12 pb-4 md:py-16 relative z-10 order-2 md:order-1">
-        <div class="inline-flex items-center gap-x-2 bg-white/20 backdrop-blur px-4 py-1 rounded-3xl text-sm font-medium mb-6">
+      <div class="text-center md:text-left pt-8 pb-2 md:py-16 relative z-10 order-1 md:order-1">
+        <div class="inline-flex items-center gap-x-2 bg-white/20 backdrop-blur px-4 py-1 rounded-3xl text-sm font-medium mb-4 md:mb-6">
           Atelier pour enfants • 5-12 ans
         </div>
 
-        <h1 class="kid-title text-6xl md:text-7xl font-extrabold tracking-tighter leading-none mb-4">
-          Mon dessin<br>devient <span class="text-yellow-300">3D</span>
+        <h1 class="kid-title text-4xl md:text-7xl font-extrabold tracking-tighter leading-none mb-3 md:mb-4">
+          Mon dessin<span class="hidden md:inline"><br></span><span class="md:hidden"> </span>devient <span class="text-yellow-300">3D</span>
         </h1>
-        <p class="text-2xl md:text-3xl text-white/90 mb-8 max-w-md mx-auto md:mx-0">
-          Dessine sur papier.<br>
-          Nous le transformerons en 3D magique !
+        <p class="text-xl md:text-3xl font-semibold text-white/95 mb-3 md:mb-5 max-w-lg mx-auto md:mx-0">
+          Dessine sur papier, on le transforme en <span class="text-yellow-300 font-bold">3D magique</span> ✨
         </p>
 
-        <a href="3D.html" class="inline-flex items-center gap-x-3 px-8 py-4 bg-white text-indigo-700 hover:bg-yellow-50 active:bg-yellow-100 font-extrabold rounded-3xl shadow-xl shadow-indigo-900/20 transition-all text-lg tracking-tight hover:scale-105 transform">
+        <div class="inline-flex items-center gap-x-2 bg-white/20 backdrop-blur px-4 py-2 rounded-2xl text-sm md:text-base font-semibold mb-4 md:mb-8">
+          <i class="fa-regular fa-calendar-days text-yellow-300"></i>
+          <span>Mercredi 24 juin · à partir de 10h00</span>
+        </div>
+
+        <!-- Bouton visible uniquement sur desktop -->
+        <a href="3D.html" class="hidden md:inline-flex items-center gap-x-3 px-8 py-4 bg-white text-indigo-700 hover:bg-yellow-50 active:bg-yellow-100 font-extrabold rounded-3xl shadow-xl shadow-indigo-900/20 transition-all text-lg tracking-tight hover:scale-105 transform">
           <i class="fa-solid fa-cube text-xl"></i>
           <span>Visiter le Musée 3D →</span>
         </a>
       </div>
 
       <!-- DROITE : modèle 3D de Julien (rotatif, sans bordure) -->
-      <div class="relative h-[340px] md:h-full md:self-stretch md:min-h-[520px] order-1 md:order-2 z-[120]">
+      <div class="relative h-[400px] md:h-full md:self-stretch md:min-h-[520px] order-2 md:order-2 z-[120]">
         <!-- Ambiance légère qui flotte DERRIÈRE le modèle 3D -->
         <div class="hero-bg behind" aria-hidden="true">
           <span class="halo"></span>
@@ -284,7 +325,8 @@
           disable-pan
           interaction-prompt="none"
           touch-action="pan-y"
-          shadow-intensity="0"
+          shadow-intensity="2"
+          shadow-softness="0.3"
           exposure="1.15"
           loading="eager"
           class="hero-model"
@@ -298,11 +340,24 @@
           <span class="float f6"></span>
         </div>
 
-        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/25 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full pointer-events-none flex items-center gap-x-1.5 shadow">
-          <span>🖱️</span><span>Fais-moi tourner</span>
+        <div class="absolute left-1/2 -translate-x-1/2 pointer-events-none flex items-center gap-x-2 bg-black/15 backdrop-blur-sm px-3.5 py-1.5 rounded-full" style="bottom:1rem;">
+          <!-- Main qui glisse gauche-droite pour faire tourner -->
+          <div class="swipe-hint">
+            <span class="swipe-chev">‹</span>
+            <span class="swipe-hand">🖐️</span>
+            <span class="swipe-chev">›</span>
+          </div>
+          <span class="text-white text-xs font-extrabold tracking-wide">360°</span>
         </div>
       </div>
 
+      <!-- Bouton CTA mobile uniquement, sous le modèle 3D -->
+      <div class="md:hidden order-3 flex justify-center pb-10 pt-2">
+        <a href="3D.html" class="inline-flex items-center gap-x-3 px-8 py-4 bg-white text-indigo-700 font-extrabold rounded-3xl shadow-xl shadow-indigo-900/20 transition-all text-lg tracking-tight active:bg-yellow-100">
+          <i class="fa-solid fa-cube text-xl"></i>
+          <span>Visiter le Musée 3D →</span>
+        </a>
+      </div>
     </div>
   </header>
 
