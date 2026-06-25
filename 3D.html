@@ -316,6 +316,18 @@
       }
     }
 
+    @media (min-width: 1024px) {
+      .container {
+        max-width: 1240px;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+      }
+
+    }
+
     .drawer-link:hover {
       background: #f1f5f9;
     }
@@ -336,6 +348,12 @@
       border-radius: 0;
       background-color: #1e2937;
       --poster-color: #1e2937;
+    }
+
+    @media (min-width: 1024px) {
+      .inline-model {
+        height: 380px;
+      }
     }
 
     .inline-model-loader,
@@ -925,28 +943,77 @@
       const containers = Array.from(document.querySelectorAll('.inline-model'));
       if (containers.length === 0) return;
 
+      function configureViewer(viewer) {
+        viewer.setAttribute('camera-controls', '');
+        viewer.setAttribute('disable-pan', '');
+        viewer.setAttribute('interaction-prompt', 'none');
+        viewer.setAttribute('touch-action', 'pan-y');
+        viewer.setAttribute('shadow-intensity', '1');
+        viewer.setAttribute('exposure', '1.1');
+        viewer.setAttribute('camera-orbit', '0deg 72deg auto');
+      }
+
+      function createInlineViewer(container) {
+        const viewer = document.createElement('model-viewer');
+        configureViewer(viewer);
+        viewer.setAttribute('alt', container.dataset.alt || 'Modèle 3D');
+        return viewer;
+      }
+
+      function loadViewerSrc(viewer, glb) {
+        if (!glb) return;
+        if (window.ModelAssetCache && typeof ModelAssetCache.resolve === 'function') {
+          ModelAssetCache.resolve(glb).then((cachedSrc) => {
+            if (viewer.getAttribute('src') !== cachedSrc) viewer.setAttribute('src', cachedSrc);
+          });
+        } else if (viewer.getAttribute('src') !== glb) {
+          viewer.setAttribute('src', glb);
+        }
+      }
+
+      function initDesktopInlineModels() {
+        containers.forEach((container) => {
+          const loaderText = container.querySelector('.inline-model-loader-text');
+          if (loaderText) loaderText.textContent = 'Chargement du modèle 3D...';
+
+          const viewer = createInlineViewer(container);
+          container.classList.add('active');
+          container.insertBefore(viewer, container.firstChild);
+
+          viewer.addEventListener('load', () => container.classList.add('loaded'));
+          viewer.addEventListener('progress', (event) => {
+            if (event.detail.totalProgress >= 1) container.classList.add('loaded');
+          });
+          viewer.addEventListener('error', () => container.classList.add('error'));
+
+          loadViewerSrc(viewer, container.dataset.glb);
+        });
+      }
+
+      if (window.matchMedia('(min-width: 1024px)').matches) {
+        initDesktopInlineModels();
+        return;
+      }
+
       const sharedViewer = document.createElement('model-viewer');
-      sharedViewer.setAttribute('camera-controls', '');
-      sharedViewer.setAttribute('disable-pan', '');
-      sharedViewer.setAttribute('interaction-prompt', 'none');
-      sharedViewer.setAttribute('touch-action', 'pan-y');
-      sharedViewer.setAttribute('shadow-intensity', '1');
-      sharedViewer.setAttribute('exposure', '1.1');
+      configureViewer(sharedViewer);
 
       let activeContainer = null;
       const visibleContainers = new Set();
       let rafId = null;
+      let lastSwitchAt = 0;
 
       function setActive(container) {
         if (!container || activeContainer === container) return;
 
         if (activeContainer) {
-          activeContainer.classList.remove('active', 'loaded', 'error');
+          activeContainer.classList.remove('active', 'error');
           const previousText = activeContainer.querySelector('.inline-model-loader-text');
           if (previousText) previousText.textContent = 'Modèle 3D prêt à afficher';
         }
 
         activeContainer = container;
+        lastSwitchAt = performance.now();
         activeContainer.classList.add('active');
         const loaderText = activeContainer.querySelector('.inline-model-loader-text');
         if (loaderText) loaderText.textContent = 'Chargement du modèle 3D...';
@@ -956,7 +1023,7 @@
         const glb = activeContainer.dataset.glb;
         if (glb && sharedViewer.getAttribute('src') !== glb) {
           activeContainer.classList.remove('loaded', 'error');
-          sharedViewer.setAttribute('src', glb);
+          loadViewerSrc(sharedViewer, glb);
         } else if (glb) {
           activeContainer.classList.add('loaded');
         }
@@ -966,17 +1033,27 @@
         let best = null;
         let bestScore = Infinity;
         const viewportCenter = window.innerHeight / 2;
+        let activeScore = Infinity;
 
         visibleContainers.forEach((container) => {
           const rect = container.getBoundingClientRect();
           if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
           const center = rect.top + rect.height / 2;
           const score = Math.abs(center - viewportCenter);
+          if (container === activeContainer) activeScore = score;
           if (score < bestScore) {
             best = container;
             bestScore = score;
           }
         });
+
+        if (!best) return;
+
+        if (activeContainer && best !== activeContainer) {
+          const elapsed = performance.now() - lastSwitchAt;
+          const minimumImprovement = Math.min(120, window.innerHeight * 0.16);
+          if (elapsed < 450 || activeScore - bestScore < minimumImprovement) return;
+        }
 
         if (best) {
           setActive(best);
@@ -1014,8 +1091,8 @@
         });
         scheduleChoice();
       }, {
-        rootMargin: '120px 0px',
-        threshold: 0.12
+        rootMargin: '24px 0px',
+        threshold: 0.35
       });
 
       containers.forEach((container) => observer.observe(container));

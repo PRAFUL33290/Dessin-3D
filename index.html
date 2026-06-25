@@ -67,13 +67,29 @@
 
     /* HERO 3D model : entrée + flottement doux en boucle */
     .hero-model {
-      animation: heroRise 1.3s cubic-bezier(0.16, 1, 0.3, 1) both,
-                 heroFloat 4s ease-in-out 1.3s infinite;
+      opacity: 0;
+      transform: translateY(28px) scale(0.97);
+      pointer-events: none;
+      --progress-bar-height: 0px;
+      --progress-bar-color: transparent;
+      --progress-mask: transparent;
     }
 
-    @keyframes heroRise {
-      from { transform: translateY(60px); opacity: 0; }
-      to   { transform: translateY(0);    opacity: 1; }
+    .hero-model.is-ready {
+      pointer-events: auto;
+      animation: heroArrive 0.9s cubic-bezier(0.16, 1, 0.3, 1) both,
+                 heroFloat 4s ease-in-out 0.9s infinite;
+    }
+
+    @keyframes heroArrive {
+      from {
+        transform: translateY(28px) scale(0.97);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
     }
 
     @keyframes heroFloat {
@@ -86,6 +102,10 @@
     model-viewer#hero-viewer:focus,
     model-viewer#hero-viewer:focus-visible {
       outline: none;
+    }
+
+    model-viewer#hero-viewer::part(default-progress-bar) {
+      display: none;
     }
 
     /* Calques d'ambiance autour du modèle 3D du hero (léger, qui flotte) */
@@ -202,6 +222,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .swipe-hand { animation: none; }
+      .hero-model.is-ready { animation: none; opacity: 1; transform: none; }
       .hero-bg .halo,
       .hero-bg .float { animation: none; }
     }
@@ -632,12 +653,20 @@
       const viewer = document.getElementById('hero-viewer');
       if (!viewer) return;
 
+      function revealHeroModel() {
+        viewer.classList.add('is-ready');
+      }
+
+      viewer.addEventListener('load', revealHeroModel, { once: true });
+
       const modelSrc = viewer.dataset.src;
       if (modelSrc) {
         ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
           if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
         });
       }
+
+      setTimeout(revealHeroModel, 10000);
     }
 
     function initExpoDate() {
