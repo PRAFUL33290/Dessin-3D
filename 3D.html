@@ -922,6 +922,20 @@
       requestAnimationFrame(() => viewer.setAttribute('src', glb));
     }
 
+    function isModelInUse(glb, ignoredViewer) {
+      if (!glb) return false;
+      return Array.from(document.querySelectorAll('model-viewer')).some((viewer) => {
+        return viewer !== ignoredViewer && viewer.dataset.sourceModel === glb && viewer.hasAttribute('src');
+      });
+    }
+
+    function releaseCachedModelMemory(glb, ignoredViewer) {
+      if (!glb || isModelInUse(glb, ignoredViewer)) return;
+      if (window.ModelAssetCache && typeof ModelAssetCache.release === 'function') {
+        ModelAssetCache.release(glb);
+      }
+    }
+
     function initModelZoom() {
       const overlay = document.getElementById('model-zoom');
       const viewer = document.getElementById('model-zoom-viewer');
@@ -951,7 +965,12 @@
       }
 
       function close() {
+        const glb = viewer.dataset.sourceModel;
         overlay.classList.remove('open');
+        viewer.removeAttribute('src');
+        delete viewer.dataset.modelKey;
+        delete viewer.dataset.pendingModelKey;
+        releaseCachedModelMemory(glb, viewer);
         hideLoader();
         document.body.style.overflow = '';
       }
@@ -1002,12 +1021,14 @@
         if (!glb) return;
 
         container.dataset.viewerReady = 'true';
+        container.dataset.loadToken = String(Date.now() + Math.random());
         container.classList.add('active');
-        container.classList.remove('error');
+        container.classList.remove('loaded', 'error');
         const loaderText = container.querySelector('.inline-model-loader-text');
         if (loaderText) loaderText.textContent = 'Chargement du modèle 3D...';
 
         const viewer = createInlineViewer(container);
+        const loadToken = container.dataset.loadToken;
         container.insertBefore(viewer, container.firstChild);
 
         viewer.addEventListener('load', () => container.classList.add('loaded'));
@@ -1018,7 +1039,30 @@
           retryModelDirectly(viewer, () => container.classList.add('error'));
         });
 
-        setCachedModelSrc(viewer, glb, () => container.isConnected);
+        setCachedModelSrc(viewer, glb, () => {
+          return container.isConnected && container.dataset.loadToken === loadToken && container.contains(viewer);
+        });
+      }
+
+      function releaseInlineViewer(container) {
+        if (!container || container.dataset.viewerReady !== 'true') return;
+
+        const viewer = container.querySelector(':scope > model-viewer');
+        const glb = container.dataset.glb;
+
+        delete container.dataset.viewerReady;
+        delete container.dataset.loadToken;
+        container.classList.remove('active', 'loaded', 'error');
+
+        const loaderText = container.querySelector('.inline-model-loader-text');
+        if (loaderText) loaderText.textContent = 'Modèle 3D prêt à afficher';
+
+        if (viewer) {
+          viewer.removeAttribute('src');
+          viewer.remove();
+        }
+
+        releaseCachedModelMemory(glb, viewer);
       }
 
       if (!('IntersectionObserver' in window)) {
@@ -1028,12 +1072,14 @@
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          ensureInlineViewer(entry.target);
-          observer.unobserve(entry.target);
+          if (entry.isIntersecting) {
+            ensureInlineViewer(entry.target);
+          } else {
+            releaseInlineViewer(entry.target);
+          }
         });
       }, {
-        rootMargin: '220px 0px',
+        rootMargin: '320px 0px',
         threshold: 0.01
       });
 

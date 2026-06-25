@@ -86,9 +86,7 @@
     if (!source) return;
 
     const absoluteUrl = new URL(source, document.baseURI).href;
-    const objectUrl = objectUrls.get(absoluteUrl);
-    if (objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrls.delete(absoluteUrl);
+    release(source);
     pendingUrls.delete(absoluteUrl);
 
     if ('caches' in window) {
@@ -101,5 +99,14 @@
     }
   }
 
-  window.ModelAssetCache = { resolve, invalidate };
+  function release(source) {
+    if (!source) return;
+
+    const absoluteUrl = new URL(source, document.baseURI).href;
+    const objectUrl = objectUrls.get(absoluteUrl);
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    objectUrls.delete(absoluteUrl);
+  }
+
+  window.ModelAssetCache = { resolve, invalidate, release };
 })();
