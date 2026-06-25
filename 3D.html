@@ -655,39 +655,43 @@
 
         resetViewerProgress(viewer);
         viewer.dataset.loading = 'true';
+        // Le watchdog est armé AVANT le resolve : si le resolve ou le rendu
+        // reste coincé, on récupère quand même.
+        watchForStall(viewer);
         ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
-          // Ne jamais remplacer cette URL lors d'un scroll : l'instance 3D,
-          // sa caméra et sa texture restent attachées au même élément.
-          if (viewer.hasAttribute('src')) return;
-          viewer.src = cachedSrc;
-          watchForStall(viewer, cachedSrc);
+          if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
+        }).catch(() => {
+          // Le watchdog relancera ; ne pas laisser l'erreur bloquer le flag.
         }).finally(() => {
           delete viewer.dataset.loading;
         });
       }
-      // Sur iOS, recharger un modèle après l'avoir déchargé peut rester bloqué
-      // à 0 % : Safari a suspendu le canvas hors écran ou l'événement « load »
-      // est perdu sous la pression mémoire. On surveille donc : si le modèle
-      // n'est toujours pas chargé après quelques secondes, on relance une fois
-      // le chargement depuis le cache (instantané, sans re-téléchargement).
-      function watchForStall(viewer, cachedSrc) {
+      // Sur iOS, un modèle peut rester bloqué à 0 % : resolve lent, canvas
+      // suspendu, ou contexte WebGL perdu sous pression mémoire. On surveille :
+      // si le modèle n'est pas chargé après quelques secondes, on réinitialise
+      // tout état coincé et on relance une fois le chargement depuis le cache.
+      function watchForStall(viewer) {
         clearTimeout(viewer._stallTimer);
         viewer._stallTimer = setTimeout(() => {
           if (viewer.loaded) return;          // chargé : rien à faire
           if (viewer._stallRetried) return;   // déjà relancé une fois
           viewer._stallRetried = true;
+          const modelSrc = viewer.dataset.src;
+          if (!modelSrc) return;
+          delete viewer.dataset.loading;      // débloque un flag resté coincé
           viewer.removeAttribute('src');
           resetViewerProgress(viewer);
-          requestAnimationFrame(() => {
-            if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
-          });
+          ModelAssetCache.resolve(modelSrc).then((cachedSrc) => {
+            requestAnimationFrame(() => {
+              if (!viewer.hasAttribute('src')) viewer.src = cachedSrc;
+            });
+          }).catch(() => {});
         }, 5000);
       }
       function unloadViewer(viewer) {
-        // Libère la mémoire GPU d'un modèle loin hors écran. Sur iOS, garder
-        // tous les modèles chargés sature la mémoire de l'onglet et Safari
-        // finit par recharger la page. Le blob reste en cache : recharger est
-        // instantané, donc l'utilisateur ne voit jamais le modèle disparaître.
+        // Libère la mémoire GPU d'un modèle hors de la fenêtre. Le blob reste
+        // en cache : recharger est instantané, l'utilisateur ne voit jamais un
+        // modèle visible disparaître (on ne décharge que hors écran).
         if (viewer.dataset.loading === 'true') return; // chargement en cours : on laisse finir
         if (!viewer.hasAttribute('src')) return;       // déjà déchargé
         clearTimeout(viewer._stallTimer);              // évite un rechargement parasite
@@ -762,36 +766,62 @@
       cards.forEach((card) => fragment.appendChild(card));
       container.appendChild(fragment);
 
-      // Chargement paresseux avec fenêtre glissante. Charger les 7 modèles d'un
-      // coup ouvre autant de contextes WebGL + textures en mémoire et fait
-      // planter l'onglet sur mobile. Mais les garder tous chargés ensuite
-      // (après avoir scrollé toute la page) sature aussi la mémoire iOS et
-      // recharge l'onglet. On charge donc un modèle quand il approche (400px)
-      // et on le décharge quand il s'éloigne loin de l'écran (1500px), ce qui
-      // borne la mémoire à ~3 modèles vivants quel que soit le temps passé sur
-      // la page. L'écart 400/1500px évite tout va-et-vient près du bord, et le
-      // rechargement depuis le cache est instantané : un modèle visible ne
-      // disparaît jamais.
-      if ('IntersectionObserver' in window) {
-        const loadObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) ensureViewerLoaded(entry.target);
-          });
-        }, { rootMargin: '400px 0px' });
+      // Chargement paresseux à plafond fixe. Sur iOS, deux pièges :
+      //  1. charger plusieurs modèles d'un coup (scroll rapide où chaque modèle
+      //     traverse une zone de chargement) crée une rafale de contextes WebGL
+      //     → pic mémoire → Safari recharge l'onglet (page blanche) ;
+      //  2. garder tous les modèles chargés sature aussi la mémoire.
+      // On garde donc EN MÉMOIRE au plus MAX_LOADED modèles : les plus proches
+      // de l'écran. Tout le reste est déchargé (GPU libéré, blob gardé en cache
+      // pour un rechargement instantané). Le calcul est throttlé : même un
+      // scroll très rapide ne déclenche jamais de rafale.
+      const MAX_LOADED = 3;     // modèles 3D vivants simultanément (mémoire bornée)
+      const LOAD_MARGIN = 600;  // px hors écran en-deçà desquels on peut charger
 
-        const keepObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) unloadViewer(entry.target);
-          });
-        }, { rootMargin: '1500px 0px' });
-
-        viewersToLoad.forEach((viewer) => {
-          loadObserver.observe(viewer);
-          keepObserver.observe(viewer);
-        });
-      } else {
-        viewersToLoad.forEach((viewer) => ensureViewerLoaded(viewer));
+      function viewerDistance(viewer) {
+        const rect = viewer.getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        if (rect.bottom < 0) return -rect.bottom;   // au-dessus de l'écran
+        if (rect.top > vh) return rect.top - vh;    // en-dessous de l'écran
+        return 0;                                   // visible
       }
+
+      function reconcileViewers() {
+        // On classe les modèles par distance à l'écran ; seuls les MAX_LOADED
+        // plus proches (et assez proches) restent chargés, les autres déchargés.
+        const ranked = viewersToLoad
+          .map((viewer) => ({ viewer, dist: viewerDistance(viewer) }))
+          .sort((a, b) => a.dist - b.dist);
+
+        ranked.forEach(({ viewer, dist }, index) => {
+          if (dist <= LOAD_MARGIN && index < MAX_LOADED) {
+            ensureViewerLoaded(viewer);
+          } else {
+            unloadViewer(viewer);
+          }
+        });
+      }
+
+      // Throttle : au plus un recalcul toutes les 200 ms, avec un dernier
+      // passage garanti quand le scroll s'arrête.
+      let reconcileScheduled = false;
+      let lastReconcile = 0;
+      function scheduleReconcile() {
+        if (reconcileScheduled) return;
+        reconcileScheduled = true;
+        const run = () => {
+          reconcileScheduled = false;
+          lastReconcile = Date.now();
+          reconcileViewers();
+        };
+        const since = Date.now() - lastReconcile;
+        if (since >= 200) requestAnimationFrame(run);
+        else setTimeout(run, 200 - since);
+      }
+
+      window.addEventListener('scroll', scheduleReconcile, { passive: true });
+      window.addEventListener('resize', scheduleReconcile, { passive: true });
+      reconcileViewers(); // état initial
     }
 
     function initMenu() {

@@ -3,6 +3,16 @@
   const objectUrls = new Map();
   const pendingUrls = new Map();
 
+  // Un fetch sans limite peut rester suspendu indéfiniment (réseau iOS
+  // capricieux), ce qui figerait la promesse en cache et bloquerait le modèle
+  // à 0 % pour toujours. On borne donc chaque téléchargement dans le temps.
+  function fetchWithTimeout(url, ms) {
+    if (typeof AbortController === 'undefined') return fetch(url);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
+  }
+
   async function resolve(source) {
     if (!source) return source;
 
@@ -19,7 +29,7 @@
           response = await cache.match(absoluteUrl);
 
           if (!response) {
-            response = await fetch(absoluteUrl);
+            response = await fetchWithTimeout(absoluteUrl, 20000);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             try {
               await cache.put(absoluteUrl, response.clone());
@@ -30,7 +40,7 @@
             }
           }
         } else {
-          response = await fetch(absoluteUrl);
+          response = await fetchWithTimeout(absoluteUrl, 20000);
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
         }
 
