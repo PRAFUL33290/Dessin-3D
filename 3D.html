@@ -663,6 +663,16 @@
           delete viewer.dataset.loading;
         });
       }
+      function unloadViewer(viewer) {
+        // Libère la mémoire GPU d'un modèle loin hors écran. Sur iOS, garder
+        // tous les modèles chargés sature la mémoire de l'onglet et Safari
+        // finit par recharger la page. Le blob reste en cache : recharger est
+        // instantané, donc l'utilisateur ne voit jamais le modèle disparaître.
+        if (viewer.dataset.loading === 'true') return; // chargement en cours : on laisse finir
+        if (!viewer.hasAttribute('src')) return;       // déjà déchargé
+        viewer.removeAttribute('src');
+        resetViewerProgress(viewer);
+      }
 
       const cards = [];
       const viewersToLoad = [];
@@ -724,20 +734,33 @@
       cards.forEach((card) => fragment.appendChild(card));
       container.appendChild(fragment);
 
-      // Chargement paresseux : on ne télécharge et n'affiche un modèle 3D que
-      // lorsqu'il approche de l'écran. Charger les 7 modèles d'un coup ouvre
-      // autant de contextes WebGL + blobs en mémoire et fait planter l'onglet
-      // sur mobile (rechargement puis page blanche). Une fois chargé, un modèle
-      // n'est jamais déchargé : il ne disparaît donc pas au défilement.
+      // Chargement paresseux avec fenêtre glissante. Charger les 7 modèles d'un
+      // coup ouvre autant de contextes WebGL + textures en mémoire et fait
+      // planter l'onglet sur mobile. Mais les garder tous chargés ensuite
+      // (après avoir scrollé toute la page) sature aussi la mémoire iOS et
+      // recharge l'onglet. On charge donc un modèle quand il approche (400px)
+      // et on le décharge quand il s'éloigne loin de l'écran (1500px), ce qui
+      // borne la mémoire à ~3 modèles vivants quel que soit le temps passé sur
+      // la page. L'écart 400/1500px évite tout va-et-vient près du bord, et le
+      // rechargement depuis le cache est instantané : un modèle visible ne
+      // disparaît jamais.
       if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries) => {
+        const loadObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            ensureViewerLoaded(entry.target);
-            observer.unobserve(entry.target);
+            if (entry.isIntersecting) ensureViewerLoaded(entry.target);
           });
         }, { rootMargin: '400px 0px' });
-        viewersToLoad.forEach((viewer) => observer.observe(viewer));
+
+        const keepObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) unloadViewer(entry.target);
+          });
+        }, { rootMargin: '1500px 0px' });
+
+        viewersToLoad.forEach((viewer) => {
+          loadObserver.observe(viewer);
+          keepObserver.observe(viewer);
+        });
       } else {
         viewersToLoad.forEach((viewer) => ensureViewerLoaded(viewer));
       }
