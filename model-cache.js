@@ -3,6 +3,50 @@
   const objectUrls = new Map();
   const pendingUrls = new Map();
 
+  // Sur la page Musée, détruire puis recréer un <model-viewer> à chaque
+  // micro-scroll crée de nouveaux contextes WebGL. Safari/iOS peut alors
+  // finir par afficher une page blanche. Une carte déjà rencontrée reste
+  // donc chargée jusqu'à ce que l'utilisateur quitte la page.
+  function stabilizeMuseumScroll() {
+    const isMuseumPage = /(?:^|\/)3d\.html$/i.test(window.location.pathname);
+    if (!isMuseumPage || !('IntersectionObserver' in window)) return;
+
+    const NativeIntersectionObserver = window.IntersectionObserver;
+    if (NativeIntersectionObserver.__dessin3dMuseumStable) return;
+    NativeIntersectionObserver.__dessin3dMuseumStable = true;
+
+    function StableIntersectionObserver(callback, options) {
+      const seenInlineModels = new WeakSet();
+
+      return new NativeIntersectionObserver((entries, observer) => {
+        const stableEntries = entries.filter((entry) => {
+          const target = entry.target;
+          const isInlineModel = target && target.classList && target.classList.contains('inline-model');
+
+          if (!isInlineModel) return true;
+
+          if (entry.isIntersecting) {
+            seenInlineModels.add(target);
+            return true;
+          }
+
+          // Le script de 3D.html libère le modèle dès qu'il sort de l'écran.
+          // On ignore uniquement cette sortie après son premier affichage afin
+          // d'éviter les rechargements WebGL en boucle pendant le scroll.
+          return !seenInlineModels.has(target);
+        });
+
+        if (stableEntries.length > 0) callback(stableEntries, observer);
+      }, options);
+    }
+
+    StableIntersectionObserver.prototype = NativeIntersectionObserver.prototype;
+    Object.setPrototypeOf(StableIntersectionObserver, NativeIntersectionObserver);
+    window.IntersectionObserver = StableIntersectionObserver;
+  }
+
+  stabilizeMuseumScroll();
+
   // Un fetch sans limite peut rester suspendu indéfiniment (réseau iOS
   // capricieux), ce qui figerait la promesse en cache et bloquerait le modèle
   // à 0 % pour toujours. On borne donc chaque téléchargement dans le temps.
