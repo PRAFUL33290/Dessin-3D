@@ -3,11 +3,12 @@
   const objectUrls = new Map();
   const pendingUrls = new Map();
 
-  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  const isCompactScreen = window.matchMedia
-    ? window.matchMedia('(max-width: 767px)').matches
-    : window.innerWidth <= 767;
-  const useStaticMobilePreviews = isTouchDevice && isCompactScreen;
+  // Le mode aperçu fixe est réservé aux vrais téléphones, pas aux iPad ni aux
+  // ordinateurs tactiles. L'iPad Safari contient souvent « Mobile » dans son
+  // user-agent : on ne teste donc jamais ce mot seul.
+  const isPhone = Boolean(navigator.userAgentData?.mobile) ||
+    /iPhone|iPod|Android.*Mobile|Windows Phone|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const useStaticMobilePreviews = isPhone;
 
   /*
    * En mode téléphone, les aperçus dans la galerie sont fixes. Les vrais
