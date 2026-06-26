@@ -2,138 +2,86 @@
   const CACHE_NAME = 'dessin-3d-modeles-v1';
   const objectUrls = new Map();
   const pendingUrls = new Map();
-  const releaseRequested = new Set();
-
-  function isInlineModelTarget(target) {
-    return Boolean(
-      target &&
-      target.classList &&
-      target.classList.contains('inline-model')
-    );
-  }
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
   /*
-   * La galerie crée un <model-viewer> lorsqu'une carte entre dans la zone du
-   * scroll et le détruit lorsqu'elle en sort. Sur Safari/iOS, un aller-retour
-   * rapide peut donc créer plusieurs contextes WebGL avant que les précédents
-   * soient réellement libérés : la page finit alors blanche.
-   *
-   * On laisse le code de la galerie intact, mais on stabilise son observer :
-   * - on attend 180 ms après le dernier mouvement de scroll ;
-   * - on transmet seulement la carte la plus proche de l'écran ;
-   * - on libère l'ancienne carte avant d'activer la suivante.
-   *
-   * Il n'y a donc jamais plus d'un modèle 3D de galerie actif à la fois.
+   * Safari sur iPad/iPhone peut perdre son contexte WebGL lorsqu'un modèle est
+   * détruit puis recréé pendant un scroll rapide. Sur iOS, on n'envoie donc à
+   * la galerie qu'un seul nouveau modèle après 320 ms sans scroll. Les modèles
+   * déjà ouverts restent en place : aucun va-et-vient création/destruction.
    */
-  function stabilizeMuseumScroll() {
-    const isMuseumPage = /(?:^|\/)3d\.html$/i.test(window.location.pathname);
-    if (!isMuseumPage || !('IntersectionObserver' in window)) return;
+  function stabilizeIOSGalleryScroll() {
+    if (!isIOS || !('IntersectionObserver' in window)) return;
 
     const NativeIntersectionObserver = window.IntersectionObserver;
-    if (NativeIntersectionObserver.__dessin3dMuseumStable) return;
+    if (NativeIntersectionObserver.__dessin3dIOSStable) return;
+    NativeIntersectionObserver.__dessin3dIOSStable = true;
 
-    Object.defineProperty(NativeIntersectionObserver, '__dessin3dMuseumStable', {
-      value: true,
-      configurable: true
-    });
+    function isInlineModel(target) {
+      return Boolean(
+        target &&
+        target.classList &&
+        target.classList.contains('inline-model')
+      );
+    }
 
     function StableIntersectionObserver(callback, options) {
       const states = new Map();
-      let activeTarget = null;
+      const activated = new WeakSet();
       let settleTimer = null;
 
-      function selectClosestVisibleModel() {
+      function getClosestVisibleTarget() {
         const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
         const viewportCenter = viewportHeight / 2;
-        let bestTarget = null;
-        let bestScore = Infinity;
+        let closest = null;
+        let closestScore = Infinity;
 
         states.forEach((isIntersecting, target) => {
           if (!isIntersecting || !target.isConnected) return;
 
           const rect = target.getBoundingClientRect();
-          const isVisible = rect.bottom > 0 && rect.top < viewportHeight;
-          const modelCenter = rect.top + (rect.height / 2);
-          const distance = Math.abs(modelCenter - viewportCenter);
-          const score = isVisible ? distance : 100000 + distance;
+          const visible = rect.bottom > 0 && rect.top < viewportHeight;
+          const center = rect.top + (rect.height / 2);
+          const score = (visible ? 0 : 100000) + Math.abs(center - viewportCenter);
 
-          if (score < bestScore) {
-            bestScore = score;
-            bestTarget = target;
+          if (score < closestScore) {
+            closest = target;
+            closestScore = score;
           }
         });
 
-        return bestTarget;
+        return closest;
       }
 
-      function applyStableState(nativeObserver) {
-        const nextTarget = selectClosestVisibleModel();
-        if (nextTarget === activeTarget) return;
-
-        const entries = [];
-        if (activeTarget) {
-          entries.push({ target: activeTarget, isIntersecting: false });
-        }
-        if (nextTarget) {
-          entries.push({ target: nextTarget, isIntersecting: true });
-        }
-
-        activeTarget = nextTarget;
-        if (entries.length > 0) callback(entries, nativeObserver);
-      }
-
-      const nativeObserver = new NativeIntersectionObserver((entries, observer) => {
-        const passthroughEntries = [];
-        let inlineModelChanged = false;
+      return new NativeIntersectionObserver((entries, observer) => {
+        const standardEntries = [];
+        let hasInlineChange = false;
 
         entries.forEach((entry) => {
-          if (!isInlineModelTarget(entry.target)) {
-            passthroughEntries.push(entry);
+          if (!isInlineModel(entry.target)) {
+            standardEntries.push(entry);
             return;
           }
 
-          inlineModelChanged = true;
+          hasInlineChange = true;
           states.set(entry.target, entry.isIntersecting);
         });
 
-        if (passthroughEntries.length > 0) {
-          callback(passthroughEntries, observer);
-        }
-
-        if (!inlineModelChanged) return;
+        if (standardEntries.length) callback(standardEntries, observer);
+        if (!hasInlineChange) return;
 
         window.clearTimeout(settleTimer);
-        settleTimer = window.setTimeout(() => applyStableState(observer), 180);
+        settleTimer = window.setTimeout(() => {
+          const target = getClosestVisibleTarget();
+          if (!target || activated.has(target)) return;
+
+          activated.add(target);
+          // On ne transmet jamais la sortie d'une carte sur iOS : 3D.html ne
+          // détruira donc pas le lecteur pendant un aller-retour de scroll.
+          callback([{ target, isIntersecting: true }], observer);
+        }, 320);
       }, options);
-
-      const nativeObserve = nativeObserver.observe.bind(nativeObserver);
-      const nativeUnobserve = nativeObserver.unobserve.bind(nativeObserver);
-      const nativeDisconnect = nativeObserver.disconnect.bind(nativeObserver);
-
-      nativeObserver.observe = (target) => {
-        // 3D.html active le premier modèle juste après observe(). En le
-        // considérant actif immédiatement, tout changement ultérieur libère
-        // correctement ce premier lecteur avant d'en ouvrir un autre.
-        if (isInlineModelTarget(target) && !activeTarget) {
-          activeTarget = target;
-        }
-        return nativeObserve(target);
-      };
-
-      nativeObserver.unobserve = (target) => {
-        states.delete(target);
-        if (activeTarget === target) activeTarget = null;
-        return nativeUnobserve(target);
-      };
-
-      nativeObserver.disconnect = () => {
-        window.clearTimeout(settleTimer);
-        states.clear();
-        activeTarget = null;
-        return nativeDisconnect();
-      };
-
-      return nativeObserver;
     }
 
     StableIntersectionObserver.prototype = NativeIntersectionObserver.prototype;
@@ -141,7 +89,7 @@
     window.IntersectionObserver = StableIntersectionObserver;
   }
 
-  stabilizeMuseumScroll();
+  stabilizeIOSGalleryScroll();
 
   // Un fetch sans limite peut rester suspendu indéfiniment (réseau iOS
   // capricieux), ce qui figerait la promesse en cache et bloquerait le modèle
@@ -156,9 +104,11 @@
   async function resolve(source) {
     if (!source) return source;
 
-    const absoluteUrl = new URL(source, document.baseURI).href;
-    releaseRequested.delete(absoluteUrl);
+    // Les blob: URLs sont la source des erreurs de chargement visibles sur
+    // Safari. model-viewer charge donc directement le .glb sur iPad/iPhone.
+    if (isIOS) return source;
 
+    const absoluteUrl = new URL(source, document.baseURI).href;
     if (objectUrls.has(absoluteUrl)) return objectUrls.get(absoluteUrl);
     if (pendingUrls.has(absoluteUrl)) return pendingUrls.get(absoluteUrl);
 
@@ -194,14 +144,6 @@
         }
 
         const objectUrl = URL.createObjectURL(await response.blob());
-
-        // Le modèle a quitté l'écran pendant son téléchargement : ne pas
-        // conserver son Blob en mémoire, même si la requête termine après.
-        if (releaseRequested.has(absoluteUrl)) {
-          URL.revokeObjectURL(objectUrl);
-          return source;
-        }
-
         objectUrls.set(absoluteUrl, objectUrl);
         return objectUrl;
       } catch (error) {
@@ -232,6 +174,7 @@
 
   async function invalidate(source) {
     if (!source) return;
+    if (isIOS) return;
 
     const absoluteUrl = new URL(source, document.baseURI).href;
     release(source);
@@ -248,11 +191,9 @@
   }
 
   function release(source) {
-    if (!source) return;
+    if (!source || isIOS) return;
 
     const absoluteUrl = new URL(source, document.baseURI).href;
-    releaseRequested.add(absoluteUrl);
-
     const objectUrl = objectUrls.get(absoluteUrl);
     if (objectUrl) URL.revokeObjectURL(objectUrl);
     objectUrls.delete(absoluteUrl);
