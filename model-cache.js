@@ -2,22 +2,25 @@
   const CACHE_NAME = 'dessin-3d-modeles-v1';
   const objectUrls = new Map();
   const pendingUrls = new Map();
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const isCompactScreen = window.matchMedia
+    ? window.matchMedia('(max-width: 767px)').matches
+    : window.innerWidth <= 767;
+  const useStaticMobilePreviews = isTouchDevice && isCompactScreen;
 
   /*
-   * Correctif Safari/iPad : model-viewer crée des contextes WebGL. La page
-   * galerie détruit et recrée ces contextes pendant un scroll rapide, ce qui
-   * peut faire fermer Safari. Sur iOS, on conserve seulement le premier aperçu
-   * 3D dans la galerie. Les autres créations restent accessibles avec Zoom,
-   * qui ouvre un seul modèle plein écran à la fois.
+   * En mode téléphone, les aperçus dans la galerie sont fixes. Les vrais
+   * model-viewer restent réservés à la fenêtre Zoom, qui n'ouvre qu'un modèle
+   * à la fois. Cela empêche Safari de créer/détruire plusieurs contextes WebGL
+   * quand la page est scrollée rapidement.
    */
-  function makeIOSGalleryScrollSafe() {
-    if (!isIOS || !('IntersectionObserver' in window)) return;
+  function enableStaticMobilePreviews() {
+    if (!useStaticMobilePreviews || !('IntersectionObserver' in window)) return;
 
     const NativeIntersectionObserver = window.IntersectionObserver;
-    if (NativeIntersectionObserver.__dessin3dIOSGallerySafe) return;
-    NativeIntersectionObserver.__dessin3dIOSGallerySafe = true;
+    if (NativeIntersectionObserver.__dessin3dStaticMobilePreviews) return;
+    NativeIntersectionObserver.__dessin3dStaticMobilePreviews = true;
 
     function isInlineModel(target) {
       return Boolean(
@@ -27,41 +30,119 @@
       );
     }
 
-    function SafeIntersectionObserver(callback, options) {
+    function StaticPreviewObserver(callback, options) {
       return new NativeIntersectionObserver((entries, observer) => {
-        // 3D.html utilise cet observer uniquement pour créer/supprimer les
-        // aperçus de galerie. En ne transmettant pas ces entrées sur iOS,
-        // seuls le premier aperçu et les modèles ouverts avec Zoom sont créés.
+        // Le script de 3D.html utilise ce type d'entrée pour monter puis
+        // démonter les aperçus de galerie. On les bloque uniquement sur petit
+        // écran afin de ne jamais déclencher ces cycles pendant le scroll.
         const safeEntries = entries.filter((entry) => !isInlineModel(entry.target));
         if (safeEntries.length) callback(safeEntries, observer);
       }, options);
     }
 
-    SafeIntersectionObserver.prototype = NativeIntersectionObserver.prototype;
-    Object.setPrototypeOf(SafeIntersectionObserver, NativeIntersectionObserver);
-    window.IntersectionObserver = SafeIntersectionObserver;
+    StaticPreviewObserver.prototype = NativeIntersectionObserver.prototype;
+    Object.setPrototypeOf(StaticPreviewObserver, NativeIntersectionObserver);
+    window.IntersectionObserver = StaticPreviewObserver;
 
     window.addEventListener('load', () => {
+      // 3D.html construit la galerie dans son propre gestionnaire onload.
+      // Ce timeout s'exécute juste après afin de remplacer les aperçus mobiles.
       window.setTimeout(() => {
-        const models = Array.from(document.querySelectorAll('.inline-model'));
+        const style = document.createElement('style');
+        style.textContent = `
+          .inline-model.mobile-static-preview .mobile-static-image,
+          .inline-model.mobile-static-preview .mobile-static-placeholder {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+          }
+          .inline-model.mobile-static-preview .mobile-static-image {
+            object-fit: contain;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #1e2937;
+          }
+          .inline-model.mobile-static-preview .mobile-static-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #c7d2fe;
+            font-weight: 800;
+            text-align: center;
+            padding: 24px;
+            box-sizing: border-box;
+            background: radial-gradient(circle at center, #334155 0%, #1e2937 68%);
+          }
+          .inline-model.mobile-static-preview .mobile-static-placeholder i {
+            font-size: 2.25rem;
+            color: #818cf8;
+          }
+          .inline-model.mobile-static-preview .inline-model-loader {
+            display: none;
+          }
+          .inline-model.mobile-static-preview .inline-model-hint {
+            display: inline-flex;
+            z-index: 4;
+            pointer-events: none;
+          }
+          .inline-model.mobile-static-preview .zoom-action {
+            z-index: 6;
+          }
+        `;
+        document.head.appendChild(style);
 
-        // Le premier est chargé par 3D.html pour garder un aperçu visible en
-        // haut de la page. Tous les autres affichent une indication claire.
-        models.slice(1).forEach((container) => {
-          const loaderText = container.querySelector('.inline-model-loader-text');
-          const spinner = container.querySelector('.inline-model-spinner');
+        const fallbackPreviews = {
+          '3D%20MODEL/super-heros.glb': '3D%20MODEL/super-hero.png'
+        };
+
+        document.querySelectorAll('.inline-model').forEach((container) => {
+          const card = container.closest('.creation-card');
+          const sourceImages = card ? Array.from(card.querySelectorAll('.demarche-img')) : [];
+          const latestImage = sourceImages[sourceImages.length - 1];
+          const previewSource = latestImage?.currentSrc || latestImage?.src || fallbackPreviews[container.dataset.glb];
+
+          // Le premier aperçu peut avoir été créé pendant initInlineModels().
+          // On le retire aussitôt : en mobile, l'affichage dans la carte reste
+          // une image fixe et Zoom conserve le vrai lecteur 3D interactif.
+          const inlineViewer = container.querySelector(':scope > model-viewer');
+          if (inlineViewer) {
+            inlineViewer.removeAttribute('src');
+            inlineViewer.remove();
+          }
+
+          container.classList.add('mobile-static-preview', 'active', 'loaded');
+          container.dataset.staticPreview = 'true';
+          delete container.dataset.viewerReady;
+          delete container.dataset.loadToken;
+
           const hint = container.querySelector('.inline-model-hint');
+          if (hint) {
+            hint.innerHTML = '<i class="fa-solid fa-cube"></i> Aperçu fixe';
+          }
 
-          container.classList.add('active');
-          if (loaderText) loaderText.textContent = 'Appuie sur Zoom pour voir ce modèle en 3D';
-          if (spinner) spinner.style.display = 'none';
-          if (hint) hint.style.display = 'none';
+          if (previewSource) {
+            const image = document.createElement('img');
+            image.className = 'mobile-static-image';
+            image.src = previewSource;
+            image.alt = container.dataset.alt || 'Aperçu fixe du modèle 3D';
+            image.loading = 'lazy';
+            container.insertBefore(image, container.firstChild);
+          } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'mobile-static-placeholder';
+            placeholder.innerHTML = '<i class="fa-solid fa-cube"></i><span>Aperçu 3D fixe<br>Appuie sur Zoom pour le manipuler</span>';
+            container.insertBefore(placeholder, container.firstChild);
+          }
         });
       }, 0);
     });
   }
 
-  makeIOSGalleryScrollSafe();
+  enableStaticMobilePreviews();
 
   // Un fetch sans limite peut rester suspendu indéfiniment (réseau iOS
   // capricieux), ce qui figerait la promesse en cache et bloquerait le modèle
