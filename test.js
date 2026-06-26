@@ -1,4 +1,3 @@
-  <script>
     let currentSvgPath = "";
     let currentTitle = "";
 
@@ -196,4 +195,3 @@
     }
     
     window.onload = init;
-  </script>

@@ -18,6 +18,59 @@
       padding-top: 4rem;
     }
 
+    /* Header transparent en overlay sur la hero */
+    body {
+      padding-top: 0 !important;
+    }
+
+    #main-nav {
+      background: transparent !important;
+      border-bottom: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      isolation: isolate;
+    }
+
+    #main-nav::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0));
+      pointer-events: none;
+    }
+
+    #main-nav .kid-title,
+    #main-nav a:not(.drawer-link),
+    #main-nav #burger-btn {
+      color: #ffffff !important;
+      text-shadow: 0 2px 14px rgba(15, 23, 42, 0.45);
+    }
+
+    #main-nav a[aria-current="page"] {
+      background: rgba(255, 255, 255, 0.18) !important;
+      color: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    #main-nav a:not(.drawer-link):hover {
+      background: rgba(255, 255, 255, 0.14) !important;
+      color: #ffffff !important;
+    }
+
+    #main-nav a[href="3D.html"] {
+      background: rgba(99, 102, 241, 0.72) !important;
+      color: #ffffff !important;
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.28) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    body > header:first-of-type {
+      padding-top: 5.25rem !important;
+    }
+
     .kid-title {
       letter-spacing: -0.5px;
       font-weight: 700;
@@ -488,7 +541,7 @@
 <body>
 
   <!-- FIXED NAV - same as main page -->
-  <nav id="main-nav" class="fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-[100] shadow-sm">
+  <nav id="main-nav" class="fixed top-0 left-0 right-0 z-[130]">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <!-- Logo + Title -->
       <a href="index.html" class="flex items-center gap-x-3">
