@@ -6,17 +6,18 @@
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
   /*
-   * Safari sur iPad/iPhone peut perdre son contexte WebGL lorsqu'un modèle est
-   * détruit puis recréé pendant un scroll rapide. Sur iOS, on n'envoie donc à
-   * la galerie qu'un seul nouveau modèle après 320 ms sans scroll. Les modèles
-   * déjà ouverts restent en place : aucun va-et-vient création/destruction.
+   * Correctif Safari/iPad : model-viewer crée des contextes WebGL. La page
+   * galerie détruit et recrée ces contextes pendant un scroll rapide, ce qui
+   * peut faire fermer Safari. Sur iOS, on conserve seulement le premier aperçu
+   * 3D dans la galerie. Les autres créations restent accessibles avec Zoom,
+   * qui ouvre un seul modèle plein écran à la fois.
    */
-  function stabilizeIOSGalleryScroll() {
+  function makeIOSGalleryScrollSafe() {
     if (!isIOS || !('IntersectionObserver' in window)) return;
 
     const NativeIntersectionObserver = window.IntersectionObserver;
-    if (NativeIntersectionObserver.__dessin3dIOSStable) return;
-    NativeIntersectionObserver.__dessin3dIOSStable = true;
+    if (NativeIntersectionObserver.__dessin3dIOSGallerySafe) return;
+    NativeIntersectionObserver.__dessin3dIOSGallerySafe = true;
 
     function isInlineModel(target) {
       return Boolean(
@@ -26,70 +27,41 @@
       );
     }
 
-    function StableIntersectionObserver(callback, options) {
-      const states = new Map();
-      const activated = new WeakSet();
-      let settleTimer = null;
-
-      function getClosestVisibleTarget() {
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-        const viewportCenter = viewportHeight / 2;
-        let closest = null;
-        let closestScore = Infinity;
-
-        states.forEach((isIntersecting, target) => {
-          if (!isIntersecting || !target.isConnected) return;
-
-          const rect = target.getBoundingClientRect();
-          const visible = rect.bottom > 0 && rect.top < viewportHeight;
-          const center = rect.top + (rect.height / 2);
-          const score = (visible ? 0 : 100000) + Math.abs(center - viewportCenter);
-
-          if (score < closestScore) {
-            closest = target;
-            closestScore = score;
-          }
-        });
-
-        return closest;
-      }
-
+    function SafeIntersectionObserver(callback, options) {
       return new NativeIntersectionObserver((entries, observer) => {
-        const standardEntries = [];
-        let hasInlineChange = false;
-
-        entries.forEach((entry) => {
-          if (!isInlineModel(entry.target)) {
-            standardEntries.push(entry);
-            return;
-          }
-
-          hasInlineChange = true;
-          states.set(entry.target, entry.isIntersecting);
-        });
-
-        if (standardEntries.length) callback(standardEntries, observer);
-        if (!hasInlineChange) return;
-
-        window.clearTimeout(settleTimer);
-        settleTimer = window.setTimeout(() => {
-          const target = getClosestVisibleTarget();
-          if (!target || activated.has(target)) return;
-
-          activated.add(target);
-          // On ne transmet jamais la sortie d'une carte sur iOS : 3D.html ne
-          // détruira donc pas le lecteur pendant un aller-retour de scroll.
-          callback([{ target, isIntersecting: true }], observer);
-        }, 320);
+        // 3D.html utilise cet observer uniquement pour créer/supprimer les
+        // aperçus de galerie. En ne transmettant pas ces entrées sur iOS,
+        // seuls le premier aperçu et les modèles ouverts avec Zoom sont créés.
+        const safeEntries = entries.filter((entry) => !isInlineModel(entry.target));
+        if (safeEntries.length) callback(safeEntries, observer);
       }, options);
     }
 
-    StableIntersectionObserver.prototype = NativeIntersectionObserver.prototype;
-    Object.setPrototypeOf(StableIntersectionObserver, NativeIntersectionObserver);
-    window.IntersectionObserver = StableIntersectionObserver;
+    SafeIntersectionObserver.prototype = NativeIntersectionObserver.prototype;
+    Object.setPrototypeOf(SafeIntersectionObserver, NativeIntersectionObserver);
+    window.IntersectionObserver = SafeIntersectionObserver;
+
+    window.addEventListener('load', () => {
+      window.setTimeout(() => {
+        const models = Array.from(document.querySelectorAll('.inline-model'));
+
+        // Le premier est chargé par 3D.html pour garder un aperçu visible en
+        // haut de la page. Tous les autres affichent une indication claire.
+        models.slice(1).forEach((container) => {
+          const loaderText = container.querySelector('.inline-model-loader-text');
+          const spinner = container.querySelector('.inline-model-spinner');
+          const hint = container.querySelector('.inline-model-hint');
+
+          container.classList.add('active');
+          if (loaderText) loaderText.textContent = 'Appuie sur Zoom pour voir ce modèle en 3D';
+          if (spinner) spinner.style.display = 'none';
+          if (hint) hint.style.display = 'none';
+        });
+      }, 0);
+    });
   }
 
-  stabilizeIOSGalleryScroll();
+  makeIOSGalleryScrollSafe();
 
   // Un fetch sans limite peut rester suspendu indéfiniment (réseau iOS
   // capricieux), ce qui figerait la promesse en cache et bloquerait le modèle
@@ -103,10 +75,6 @@
 
   async function resolve(source) {
     if (!source) return source;
-
-    // Les blob: URLs sont la source des erreurs de chargement visibles sur
-    // Safari. model-viewer charge donc directement le .glb sur iPad/iPhone.
-    if (isIOS) return source;
 
     const absoluteUrl = new URL(source, document.baseURI).href;
     if (objectUrls.has(absoluteUrl)) return objectUrls.get(absoluteUrl);
@@ -126,6 +94,8 @@
             try {
               await cache.put(absoluteUrl, response.clone());
             } catch (cacheError) {
+              // Un quota trop faible ne doit pas provoquer un second
+              // téléchargement : on garde tout de même la réponse en mémoire.
               console.warn(`[3D cache] Stockage persistant indisponible pour ${source}`, cacheError);
             }
           } else if (!(await isUsableModelResponse(response, absoluteUrl))) {
@@ -174,7 +144,6 @@
 
   async function invalidate(source) {
     if (!source) return;
-    if (isIOS) return;
 
     const absoluteUrl = new URL(source, document.baseURI).href;
     release(source);
@@ -191,7 +160,7 @@
   }
 
   function release(source) {
-    if (!source || isIOS) return;
+    if (!source) return;
 
     const absoluteUrl = new URL(source, document.baseURI).href;
     const objectUrl = objectUrls.get(absoluteUrl);
