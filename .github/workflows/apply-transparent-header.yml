@@ -1,0 +1,117 @@
+name: Apply transparent header
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-transparent-header.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply transparent overlay header everywhere
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          files = [Path('index.html'), Path('aide-activite.html'), Path('3D.html')]
+
+          css = r'''
+
+    /* Header transparent en overlay sur la hero */
+    body {
+      padding-top: 0 !important;
+    }
+
+    #main-nav {
+      background: transparent !important;
+      border-bottom: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    #main-nav::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0));
+      pointer-events: none;
+    }
+
+    #main-nav .kid-title,
+    #main-nav a:not(.drawer-link),
+    #main-nav #burger-btn {
+      color: #ffffff !important;
+      text-shadow: 0 2px 14px rgba(15, 23, 42, 0.45);
+    }
+
+    #main-nav a[aria-current="page"] {
+      background: rgba(255, 255, 255, 0.18) !important;
+      color: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    #main-nav a:not(.drawer-link):hover {
+      background: rgba(255, 255, 255, 0.14) !important;
+      color: #ffffff !important;
+    }
+
+    #main-nav a[href="3D.html"] {
+      background: rgba(99, 102, 241, 0.72) !important;
+      color: #ffffff !important;
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.28) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    body > header:first-of-type,
+    .hero-bg-blend {
+      padding-top: 5.25rem !important;
+    }
+'''
+
+          marker = '/* Header transparent en overlay sur la hero */'
+
+          for path in files:
+            html = path.read_text(encoding='utf-8')
+
+            # Supprime l'ancien bloc si le workflow repasse.
+            html = re.sub(r'\n\s*/\* Header transparent en overlay sur la hero \*/.*?body > header:first-of-type,\n\s*\.hero-bg-blend \{\n\s*padding-top: 5\.25rem !important;\n\s*\}\n', '\n', html, flags=re.S)
+
+            if marker not in html:
+              html = html.replace('</style>', css + '\n  </style>', 1)
+
+            html = html.replace(
+              'class="fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-[130] shadow-sm"',
+              'class="fixed top-0 left-0 right-0 z-[130]"'
+            )
+
+            # Variantes éventuelles.
+            html = html.replace(
+              'class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur border-b border-slate-200 z-[130] shadow-sm"',
+              'class="fixed top-0 left-0 right-0 z-[130]"'
+            )
+
+            path.write_text(html, encoding='utf-8')
+          PY
+
+      - name: Commit transparent header
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add index.html aide-activite.html 3D.html
+            git commit -m "Ajoute un header transparent en overlay"
+            git push
+          fi
