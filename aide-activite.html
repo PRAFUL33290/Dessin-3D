@@ -49,22 +49,16 @@
       flex-shrink: 0;
     }
 
-    /* Ensure space for fixed nav */
+    /* Header in normal page flow */
     body {
-      padding-top: 4rem;
+      padding-top: 0;
     }
 
-    /* Header transparent en overlay sur la hero */
-    body {
-      padding-top: 0 !important;
-    }
-
+    /* Header transparent pose sur la hero, sans rester fixe au scroll */
     #main-nav {
-      background: transparent !important;
-      border-bottom: 0 !important;
-      box-shadow: none !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
+      background: transparent;
+      border-bottom: 0;
+      box-shadow: none;
       isolation: isolate;
     }
 
@@ -78,7 +72,7 @@
     }
 
     #main-nav .kid-title,
-    #main-nav a:not(.drawer-link),
+    #main-nav a:not(.drawer-link):not(.logo-link),
     #main-nav #burger-btn {
       color: #ffffff !important;
       text-shadow: 0 2px 14px rgba(15, 23, 42, 0.45);
@@ -90,7 +84,7 @@
       box-shadow: none !important;
     }
 
-    #main-nav a:not(.drawer-link):hover {
+    #main-nav a:not(.drawer-link):not(.logo-link):hover {
       background: rgba(255, 255, 255, 0.14) !important;
       color: #ffffff !important;
     }
@@ -104,18 +98,17 @@
     }
 
     body > header:first-of-type {
-      padding-top: 5.25rem !important;
+      padding-top: 8.5rem !important;
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
-  <!-- FIXED NAV -->
-  <nav id="main-nav" class="fixed top-0 left-0 right-0 z-[130]">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+  <!-- NAV -->
+  <nav id="main-nav" class="absolute top-0 left-0 right-0 z-[130]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-32 flex items-center justify-between">
       <!-- Logo + Title -->
-      <a href="index.html" class="flex items-center gap-x-3">
-        <img src="Logo.png" alt="Logo Mon Dessin Devient 3D" class="h-14 lg:h-10 w-auto object-contain" />
-        <div class="kid-title font-extrabold text-2xl md:text-3xl tracking-tighter text-indigo-700 hidden lg:block">Mon Dessin Devient 3D</div>
+      <a href="index.html" class="logo-link flex items-center gap-x-3">
+        <img src="Logo-Officiel.png" alt="Logo" class="h-28 lg:h-24 w-auto object-contain" />
       </a>
 
       <!-- Desktop Menu -->
@@ -154,7 +147,7 @@
       <!-- Drawer Header -->
       <div class="flex items-center justify-between px-5 h-16 border-b">
         <div class="flex items-center gap-x-3">
-          <img src="Logo.png" alt="Logo" class="h-8 w-auto object-contain" />
+          <img src="Logo-Officiel.png" alt="Logo" class="h-14 w-auto object-contain" />
           <span class="font-extrabold text-indigo-700">Menu</span>
         </div>
         <button id="drawer-close" class="w-9 h-9 flex items-center justify-center text-2xl text-slate-400 hover:text-slate-700">
