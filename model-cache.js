@@ -2,42 +2,138 @@
   const CACHE_NAME = 'dessin-3d-modeles-v1';
   const objectUrls = new Map();
   const pendingUrls = new Map();
+  const releaseRequested = new Set();
 
-  // Sur la page Musée, détruire puis recréer un <model-viewer> à chaque
-  // micro-scroll crée de nouveaux contextes WebGL. Safari/iOS peut alors
-  // finir par afficher une page blanche. Une carte déjà rencontrée reste
-  // donc chargée jusqu'à ce que l'utilisateur quitte la page.
+  function isInlineModelTarget(target) {
+    return Boolean(
+      target &&
+      target.classList &&
+      target.classList.contains('inline-model')
+    );
+  }
+
+  /*
+   * La galerie crée un <model-viewer> lorsqu'une carte entre dans la zone du
+   * scroll et le détruit lorsqu'elle en sort. Sur Safari/iOS, un aller-retour
+   * rapide peut donc créer plusieurs contextes WebGL avant que les précédents
+   * soient réellement libérés : la page finit alors blanche.
+   *
+   * On laisse le code de la galerie intact, mais on stabilise son observer :
+   * - on attend 180 ms après le dernier mouvement de scroll ;
+   * - on transmet seulement la carte la plus proche de l'écran ;
+   * - on libère l'ancienne carte avant d'activer la suivante.
+   *
+   * Il n'y a donc jamais plus d'un modèle 3D de galerie actif à la fois.
+   */
   function stabilizeMuseumScroll() {
     const isMuseumPage = /(?:^|\/)3d\.html$/i.test(window.location.pathname);
     if (!isMuseumPage || !('IntersectionObserver' in window)) return;
 
     const NativeIntersectionObserver = window.IntersectionObserver;
     if (NativeIntersectionObserver.__dessin3dMuseumStable) return;
-    NativeIntersectionObserver.__dessin3dMuseumStable = true;
+
+    Object.defineProperty(NativeIntersectionObserver, '__dessin3dMuseumStable', {
+      value: true,
+      configurable: true
+    });
 
     function StableIntersectionObserver(callback, options) {
-      const seenInlineModels = new WeakSet();
+      const states = new Map();
+      let activeTarget = null;
+      let settleTimer = null;
 
-      return new NativeIntersectionObserver((entries, observer) => {
-        const stableEntries = entries.filter((entry) => {
-          const target = entry.target;
-          const isInlineModel = target && target.classList && target.classList.contains('inline-model');
+      function selectClosestVisibleModel() {
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+        const viewportCenter = viewportHeight / 2;
+        let bestTarget = null;
+        let bestScore = Infinity;
 
-          if (!isInlineModel) return true;
+        states.forEach((isIntersecting, target) => {
+          if (!isIntersecting || !target.isConnected) return;
 
-          if (entry.isIntersecting) {
-            seenInlineModels.add(target);
-            return true;
+          const rect = target.getBoundingClientRect();
+          const isVisible = rect.bottom > 0 && rect.top < viewportHeight;
+          const modelCenter = rect.top + (rect.height / 2);
+          const distance = Math.abs(modelCenter - viewportCenter);
+          const score = isVisible ? distance : 100000 + distance;
+
+          if (score < bestScore) {
+            bestScore = score;
+            bestTarget = target;
           }
-
-          // Le script de 3D.html libère le modèle dès qu'il sort de l'écran.
-          // On ignore uniquement cette sortie après son premier affichage afin
-          // d'éviter les rechargements WebGL en boucle pendant le scroll.
-          return !seenInlineModels.has(target);
         });
 
-        if (stableEntries.length > 0) callback(stableEntries, observer);
+        return bestTarget;
+      }
+
+      function applyStableState(nativeObserver) {
+        const nextTarget = selectClosestVisibleModel();
+        if (nextTarget === activeTarget) return;
+
+        const entries = [];
+        if (activeTarget) {
+          entries.push({ target: activeTarget, isIntersecting: false });
+        }
+        if (nextTarget) {
+          entries.push({ target: nextTarget, isIntersecting: true });
+        }
+
+        activeTarget = nextTarget;
+        if (entries.length > 0) callback(entries, nativeObserver);
+      }
+
+      const nativeObserver = new NativeIntersectionObserver((entries, observer) => {
+        const passthroughEntries = [];
+        let inlineModelChanged = false;
+
+        entries.forEach((entry) => {
+          if (!isInlineModelTarget(entry.target)) {
+            passthroughEntries.push(entry);
+            return;
+          }
+
+          inlineModelChanged = true;
+          states.set(entry.target, entry.isIntersecting);
+        });
+
+        if (passthroughEntries.length > 0) {
+          callback(passthroughEntries, observer);
+        }
+
+        if (!inlineModelChanged) return;
+
+        window.clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(() => applyStableState(observer), 180);
       }, options);
+
+      const nativeObserve = nativeObserver.observe.bind(nativeObserver);
+      const nativeUnobserve = nativeObserver.unobserve.bind(nativeObserver);
+      const nativeDisconnect = nativeObserver.disconnect.bind(nativeObserver);
+
+      nativeObserver.observe = (target) => {
+        // 3D.html active le premier modèle juste après observe(). En le
+        // considérant actif immédiatement, tout changement ultérieur libère
+        // correctement ce premier lecteur avant d'en ouvrir un autre.
+        if (isInlineModelTarget(target) && !activeTarget) {
+          activeTarget = target;
+        }
+        return nativeObserve(target);
+      };
+
+      nativeObserver.unobserve = (target) => {
+        states.delete(target);
+        if (activeTarget === target) activeTarget = null;
+        return nativeUnobserve(target);
+      };
+
+      nativeObserver.disconnect = () => {
+        window.clearTimeout(settleTimer);
+        states.clear();
+        activeTarget = null;
+        return nativeDisconnect();
+      };
+
+      return nativeObserver;
     }
 
     StableIntersectionObserver.prototype = NativeIntersectionObserver.prototype;
@@ -61,6 +157,8 @@
     if (!source) return source;
 
     const absoluteUrl = new URL(source, document.baseURI).href;
+    releaseRequested.delete(absoluteUrl);
+
     if (objectUrls.has(absoluteUrl)) return objectUrls.get(absoluteUrl);
     if (pendingUrls.has(absoluteUrl)) return pendingUrls.get(absoluteUrl);
 
@@ -78,8 +176,6 @@
             try {
               await cache.put(absoluteUrl, response.clone());
             } catch (cacheError) {
-              // Un quota trop faible ne doit pas provoquer un second
-              // téléchargement : on garde tout de même la réponse en mémoire.
               console.warn(`[3D cache] Stockage persistant indisponible pour ${source}`, cacheError);
             }
           } else if (!(await isUsableModelResponse(response, absoluteUrl))) {
@@ -98,6 +194,14 @@
         }
 
         const objectUrl = URL.createObjectURL(await response.blob());
+
+        // Le modèle a quitté l'écran pendant son téléchargement : ne pas
+        // conserver son Blob en mémoire, même si la requête termine après.
+        if (releaseRequested.has(absoluteUrl)) {
+          URL.revokeObjectURL(objectUrl);
+          return source;
+        }
+
         objectUrls.set(absoluteUrl, objectUrl);
         return objectUrl;
       } catch (error) {
@@ -147,6 +251,8 @@
     if (!source) return;
 
     const absoluteUrl = new URL(source, document.baseURI).href;
+    releaseRequested.add(absoluteUrl);
+
     const objectUrl = objectUrls.get(absoluteUrl);
     if (objectUrl) URL.revokeObjectURL(objectUrl);
     objectUrls.delete(absoluteUrl);
