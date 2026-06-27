@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jivhan • Mon Dessin Devient 3D</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .kid-title {
+      letter-spacing: -0.5px;
+      font-weight: 700;
+    }
+
+    #main-nav {
+      background: transparent;
+      border-bottom: 0;
+      box-shadow: none;
+      isolation: isolate;
+    }
+
+    #main-nav::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.52), rgba(15, 23, 42, 0));
+      pointer-events: none;
+    }
+
+    #main-nav a:not(.drawer-link):not(.logo-link),
+    #main-nav #burger-btn {
+      color: #ffffff !important;
+      text-shadow: 0 2px 14px rgba(15, 23, 42, 0.45);
+    }
+
+    #main-nav a[href="3D.html"] {
+      background: rgba(99, 102, 241, 0.72) !important;
+      color: #ffffff !important;
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.28) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    #main-nav a[aria-current="page"] {
+      background: rgba(255, 255, 255, 0.18) !important;
+      color: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    .hero {
+      padding: 9.5rem 1.5rem 4.5rem;
+      text-align: center;
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.88), rgba(99, 102, 241, 0.84) 48%, rgba(236, 72, 153, 0.8)),
+        url('images/Background%20Hero-Section.png') center / cover no-repeat;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 0.95;
+      color: #ffffff;
+    }
+
+    .hero p {
+      max-width: 700px;
+      margin: 1.25rem auto 0;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+      line-height: 1.55;
+    }
+
+    .page-shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 64px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      color: #f8fafc;
+      font-size: clamp(1.6rem, 4vw, 2.25rem);
+      line-height: 1.1;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: #94a3b8;
+      max-width: 520px;
+      line-height: 1.5;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .evolution-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 44px;
+    }
+
+    .evolution-card {
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      background: #1e293b;
+      box-shadow: 0 18px 42px rgba(2, 6, 23, 0.22);
+    }
+
+    .evolution-media {
+      height: 330px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      padding: 14px;
+    }
+
+    .evolution-media.dark {
+      background: radial-gradient(circle at 50% 42%, rgba(250, 204, 21, 0.25), rgba(15, 23, 42, 0.05) 42%, #111827 100%);
+    }
+
+    .evolution-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+
+    .evolution-body {
+      padding: 15px 16px 17px;
+    }
+
+    .evolution-body h3 {
+      margin: 0 0 5px;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .evolution-body p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .drawing-showcase {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(280px, 1.18fr);
+      gap: 26px;
+      align-items: center;
+      margin-bottom: 42px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 20px;
+      background: #1e293b;
+      overflow: hidden;
+      box-shadow: 0 18px 42px rgba(2, 6, 23, 0.24);
+    }
+
+    .drawing-copy {
+      padding: 30px;
+    }
+
+    .drawing-copy .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: #fde68a;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .drawing-copy h2 {
+      margin: 0 0 12px;
+      color: #ffffff;
+      font-size: clamp(1.7rem, 4vw, 2.45rem);
+      line-height: 1.05;
+    }
+
+    .drawing-copy p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 1.03rem;
+      line-height: 1.6;
+    }
+
+    .drawing-frame {
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      padding: 22px;
+    }
+
+    .drawing-frame img {
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      border-radius: 14px;
+      box-shadow: 0 18px 34px rgba(15, 23, 42, 0.18);
+    }
+
+    .final-model-showcase {
+      margin-bottom: 48px;
+      overflow: hidden;
+      border: 1px solid rgba(250, 204, 21, 0.28);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 70% 18%, rgba(250, 204, 21, 0.16), transparent 28%),
+        linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+      box-shadow: 0 24px 64px rgba(2, 6, 23, 0.42);
+    }
+
+    .final-model-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 28px 30px 0;
+    }
+
+    .final-model-head h2 {
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(1.85rem, 4vw, 2.8rem);
+      line-height: 1.02;
+    }
+
+    .final-model-head p {
+      max-width: 470px;
+      margin: 0;
+      color: #cbd5e1;
+      line-height: 1.55;
+    }
+
+    .final-model-head .drawing-copy {
+      padding: 0;
+    }
+
+    .final-model-stage {
+      position: relative;
+      height: min(72vh, 680px);
+      min-height: 500px;
+      margin-top: 12px;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(255, 255, 255, 0.18), rgba(15, 23, 42, 0.18) 42%, rgba(15, 23, 42, 0.84) 78%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0), #0f172a);
+    }
+
+    .final-model-stage model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+      background: transparent;
+    }
+
+    .model-hint {
+      position: absolute;
+      left: 22px;
+      bottom: 22px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.76);
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      pointer-events: none;
+    }
+
+    .creation-card {
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      background: #1e293b;
+      box-shadow: 0 18px 42px rgba(2, 6, 23, 0.28);
+    }
+
+    .model-frame {
+      position: relative;
+      height: 330px;
+      background: radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.14), rgba(15, 23, 42, 0.18) 38%, #0f172a 74%);
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+      background: transparent;
+    }
+
+    .card-body {
+      padding: 18px 20px 20px;
+    }
+
+    .card-body h3 {
+      margin: 0 0 7px;
+      color: #ffffff;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .card-body p {
+      margin: 0;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .empty-state {
+      display: grid;
+      place-items: center;
+      min-height: 330px;
+      border: 1px dashed rgba(148, 163, 184, 0.38);
+      border-radius: 20px;
+      background: rgba(30, 41, 59, 0.68);
+      text-align: center;
+      padding: 34px;
+    }
+
+    .empty-state i {
+      color: #facc15;
+      font-size: 2.4rem;
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      margin: 0 0 10px;
+      color: #ffffff;
+      font-size: 1.45rem;
+      font-weight: 800;
+    }
+
+    .empty-state p {
+      max-width: 560px;
+      margin: 0;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .helper-panel {
+      margin-top: 30px;
+      border: 1px solid rgba(99, 102, 241, 0.32);
+      border-radius: 18px;
+      background: rgba(30, 41, 59, 0.78);
+      padding: 22px;
+      color: #cbd5e1;
+      line-height: 1.55;
+    }
+
+    .helper-panel strong {
+      color: #ffffff;
+    }
+
+    @media (max-width: 760px) {
+      .section-title {
+        display: block;
+      }
+
+      .section-title p {
+        margin-top: 10px;
+      }
+
+      .model-frame {
+        height: 300px;
+      }
+
+      .evolution-media {
+        height: 300px;
+      }
+
+      .drawing-showcase {
+        grid-template-columns: 1fr;
+      }
+
+      .drawing-copy {
+        padding: 24px;
+      }
+
+      .drawing-frame {
+        min-height: 340px;
+      }
+
+      .final-model-head {
+        display: block;
+        padding: 24px 22px 0;
+      }
+
+      .final-model-head p {
+        margin-top: 12px;
+      }
+
+      .final-model-stage {
+        height: 520px;
+        min-height: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav id="main-nav" class="absolute top-0 left-0 right-0 z-[130]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-32 flex items-center justify-between">
+      <a href="index.html" class="logo-link flex items-center gap-x-3">
+        <img src="Logo-Officiel.png" alt="Logo" class="h-28 lg:h-24 w-auto object-contain" />
+      </a>
+
+      <div class="hidden lg:flex items-center gap-x-3 text-base font-semibold">
+        <a href="index.html" class="flex items-center gap-x-2 px-4 py-2 rounded-2xl transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
+        </a>
+        <a href="aide-activite.html" class="flex items-center gap-x-2 px-4 py-2 rounded-2xl transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><span>Aide à l'activité</span>
+        </a>
+        <a href="article-activite.html" class="flex items-center gap-x-2 px-4 py-2 rounded-2xl transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path><path d="M8 7h8"></path><path d="M8 11h8"></path></svg><span>Articles</span>
+        </a>
+        <a href="Jivhan.html" class="flex items-center gap-x-2 px-4 py-2 rounded-2xl transition-colors" aria-current="page">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 4-2 4s2.74-.5 4-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22 22 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg><span>Jivhan</span>
+        </a>
+        <a href="3D.html" class="flex items-center gap-x-2 px-5 py-2 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 transition-all hover:scale-105 transform">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
+          <span>Le Musée 3D</span>
+        </a>
+      </div>
+
+      <button id="burger-btn"
+              class="lg:hidden w-10 h-10 flex items-center justify-center text-2xl transition-colors"
+              aria-label="Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-drawer" class="hidden lg:hidden fixed inset-0 z-[140]">
+    <div id="drawer-backdrop" class="absolute inset-0 bg-black/50 transition-opacity"></div>
+    <div id="drawer-panel"
+         class="absolute top-0 bottom-0 right-0 w-72 max-w-[80%] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col">
+      <div class="flex items-center justify-between px-5 h-16 border-b">
+        <div class="flex items-center gap-x-3">
+          <img src="Logo-Officiel.png" alt="Logo" class="h-14 w-auto object-contain" />
+          <span class="font-extrabold text-indigo-700">Menu</span>
+        </div>
+        <button id="drawer-close" class="w-9 h-9 flex items-center justify-center text-2xl text-slate-400 hover:text-slate-700">
+          &times;
+        </button>
+      </div>
+
+      <div class="flex flex-col py-2 text-lg">
+        <a href="index.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
+        </a>
+        <a href="aide-activite.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><span>Aide à l'activité</span>
+        </a>
+        <a href="article-activite.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path><path d="M8 7h8"></path><path d="M8 11h8"></path></svg><span>Articles</span>
+        </a>
+        <a href="Jivhan.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-indigo-700 bg-indigo-50 font-semibold" aria-current="page">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 4-2 4s2.74-.5 4-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22 22 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg><span>Jivhan</span>
+        </a>
+        <div class="px-6 pt-3">
+          <a href="3D.html" class="drawer-link flex items-center justify-center gap-x-3 px-6 py-3.5 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 font-semibold transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
+            <span>Le Musée 3D</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-auto p-5 text-xs text-slate-400 border-t">
+        Page de Jivhan
+      </div>
+    </div>
+  </div>
+
+  <header class="hero">
+    <p class="inline-flex items-center gap-x-2 bg-white/18 backdrop-blur px-4 py-1 rounded-3xl text-sm font-semibold mb-5">
+      <i class="fa-solid fa-cube"></i>
+      Galerie personnelle
+    </p>
+    <h1 class="kid-title">Jivhan</h1>
+    <p>La fusée de Jivhan, du dessin original jusqu’au modèle 3D interactif.</p>
+  </header>
+
+  <main class="page-shell">
+    <section class="drawing-showcase" aria-label="Dessin de Jivhan">
+      <div class="drawing-copy">
+        <div class="eyebrow">
+          <i class="fa-solid fa-pencil"></i>
+          Dessin original
+        </div>
+        <h2 class="kid-title">La fusée de Jivhan</h2>
+        <p>Voici le dessin de départ, puis toutes les étapes de transformation exposées sur la page.</p>
+      </div>
+      <div class="drawing-frame">
+        <img src="JIVHAN/01-dessin-original.png" alt="Dessin de fusée réalisé par Jivhan">
+      </div>
+    </section>
+
+    <section class="final-model-showcase" aria-label="Rendu final en 3D de la fusée de Jivhan">
+      <div class="final-model-head">
+        <div>
+          <div class="drawing-copy p-0">
+            <div class="eyebrow">
+              <i class="fa-solid fa-cube"></i>
+              Rendu final 3D
+            </div>
+          </div>
+          <h2 class="kid-title">La fusée en 3D</h2>
+        </div>
+        <p>Le modèle final est exposé ici en grand. Tu peux le faire tourner, zoomer et observer la fusée sous tous les angles.</p>
+      </div>
+      <div class="final-model-stage">
+        <model-viewer
+          src="JIVHAN/10-modele-3d.glb"
+          poster="JIVHAN/07-rendu-final.png"
+          alt="Modèle 3D final de la fusée de Jivhan"
+          camera-controls
+          auto-rotate
+          rotation-per-second="24deg"
+          shadow-intensity="1"
+          exposure="1.08"
+          interaction-prompt="none"
+          touch-action="pan-y">
+        </model-viewer>
+        <div class="model-hint">
+          <i class="fa-solid fa-rotate"></i>
+          Fais tourner la fusée
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2 class="kid-title">Évolution du dessin</h2>
+        <p>Chaque image montre une étape de la transformation, du croquis photographié au rendu final.</p>
+      </div>
+
+      <div class="evolution-grid">
+        <article class="evolution-card">
+          <div class="evolution-media">
+            <img src="JIVHAN/01-dessin-original.png" alt="Dessin original de la fusée de Jivhan">
+          </div>
+          <div class="evolution-body">
+            <h3>1. Dessin original</h3>
+            <p>La fusée dessinée et décorée par Jivhan.</p>
+          </div>
+        </article>
+
+        <article class="evolution-card">
+          <div class="evolution-media">
+            <img src="JIVHAN/02-premiere-mise-en-forme.jpg" alt="Première évolution de la fusée de Jivhan">
+          </div>
+          <div class="evolution-body">
+            <h3>2. Première mise en forme</h3>
+            <p>Le dessin commence à être préparé pour la transformation.</p>
+          </div>
+        </article>
+
+        <article class="evolution-card">
+          <div class="evolution-media">
+            <img src="JIVHAN/03-couleurs-renforcees.png" alt="Deuxième évolution de la fusée de Jivhan">
+          </div>
+          <div class="evolution-body">
+            <h3>3. Couleurs renforcées</h3>
+            <p>Les formes et les couleurs de la fusée deviennent plus nettes.</p>
+          </div>
+        </article>
+
+        <article class="evolution-card">
+          <div class="evolution-media">
+            <img src="JIVHAN/04-version-stylisee.png" alt="Troisième évolution de la fusée de Jivhan">
+          </div>
+          <div class="evolution-body">
+            <h3>4. Version stylisée</h3>
+            <p>La fusée prend une apparence plus travaillée.</p>
+          </div>
+        </article>
+
+        <article class="evolution-card">
+          <div class="evolution-media">
+            <img src="JIVHAN/05-preparation-3d.png" alt="Quatrième évolution de la fusée de Jivhan">
+          </div>
+          <div class="evolution-body">
+            <h3>5. Préparation 3D</h3>
+            <p>Le visuel se rapproche du rendu final.</p>
+          </div>
+        </article>
+
+        <article class="evolution-card">
+          <div class="evolution-media">
+            <img src="JIVHAN/06-rendu-intermediaire.png" alt="Rendu intermédiaire de la fusée de Jivhan">
+          </div>
+          <div class="evolution-body">
+            <h3>6. Rendu intermédiaire</h3>
+            <p>Une version plus réaliste avant l’exposition finale.</p>
+          </div>
+        </article>
+
+        <article class="evolution-card">
+          <div class="evolution-media dark">
+            <img src="JIVHAN/07-rendu-final.png" alt="Rendu final de la fusée 3D de Jivhan">
+          </div>
+          <div class="evolution-body">
+            <h3>7. Rendu final</h3>
+            <p>La fusée devient une création 3D colorée.</p>
+          </div>
+        </article>
+
+        <article class="evolution-card">
+          <div class="evolution-media">
+            <img src="JIVHAN/08-trois-fusees.png" alt="Trois fusées de Jivhan côte à côte">
+          </div>
+          <div class="evolution-body">
+            <h3>8. Trois fusées</h3>
+            <p>Une variation avec plusieurs fusées côte à côte.</p>
+          </div>
+        </article>
+
+        <article class="evolution-card">
+          <div class="evolution-media">
+            <img src="JIVHAN/09-mille-fusees.jpg" alt="Composition avec beaucoup de fusées de Jivhan">
+          </div>
+          <div class="evolution-body">
+            <h3>9. Mille fusées</h3>
+            <p>Une composition remplie de fusées rouges.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-700 bg-[#1e2937] py-10 text-center">
+    <div class="max-w-3xl mx-auto px-6">
+      <img src="Logo-Footer.png" alt="Logo footer" class="h-24 md:h-32 w-auto max-w-full object-contain mx-auto mb-5 drop-shadow-md" />
+      <p class="text-lg font-extrabold text-indigo-300">Création par Julien Animateur ✨</p>
+      <p class="mt-3 text-xs text-slate-500">
+        Julien Animateur — Animateur élémentaire / maternelle • Arc en ciel • Bruges
+      </p>
+    </div>
+  </footer>
+
+  <script src="model-cache.js"></script>
+  <script>
+    function initMenu() {
+      const burger = document.getElementById('burger-btn');
+      const drawer = document.getElementById('mobile-drawer');
+      const panel = document.getElementById('drawer-panel');
+      const backdrop = document.getElementById('drawer-backdrop');
+      const closeBtn = document.getElementById('drawer-close');
+
+      if (!burger || !drawer || !panel) return;
+
+      function openDrawer() {
+        drawer.classList.remove('hidden');
+        drawer.classList.add('flex');
+        requestAnimationFrame(() => {
+          panel.classList.remove('translate-x-full');
+          panel.classList.add('translate-x-0');
+        });
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDrawer() {
+        panel.classList.remove('translate-x-0');
+        panel.classList.add('translate-x-full');
+        setTimeout(() => {
+          drawer.classList.remove('flex');
+          drawer.classList.add('hidden');
+          document.body.style.overflow = '';
+        }, 280);
+      }
+
+      burger.addEventListener('click', openDrawer);
+      if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+      if (backdrop) backdrop.addEventListener('click', closeDrawer);
+      drawer.querySelectorAll('.drawer-link').forEach((link) => link.addEventListener('click', closeDrawer));
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !drawer.classList.contains('hidden')) closeDrawer();
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initMenu();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'activité du mercredi matin • Mon Dessin Devient 3D</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body, .kid-title {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .kid-title {
+      letter-spacing: -0.5px;
+      font-weight: 700;
+    }
+
+    body {
+      padding-top: 0;
+    }
+
+    #main-nav {
+      background: transparent;
+      border-bottom: 0;
+      box-shadow: none;
+      isolation: isolate;
+    }
+
+    #main-nav::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0));
+      pointer-events: none;
+    }
+
+    #main-nav a:not(.drawer-link):not(.logo-link),
+    #main-nav #burger-btn {
+      color: #ffffff !important;
+      text-shadow: 0 2px 14px rgba(15, 23, 42, 0.45);
+    }
+
+    #main-nav a[aria-current="page"] {
+      background: rgba(255, 255, 255, 0.18) !important;
+      color: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    #main-nav a:not(.drawer-link):not(.logo-link):hover {
+      background: rgba(255, 255, 255, 0.14) !important;
+      color: #ffffff !important;
+    }
+
+    #main-nav a[href="3D.html"] {
+      background: rgba(99, 102, 241, 0.72) !important;
+      color: #ffffff !important;
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.28) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .article-hero {
+      padding-top: 8.5rem;
+      background:
+        linear-gradient(135deg, rgba(99, 102, 241, 0.86) 0%, rgba(168, 85, 247, 0.76) 50%, rgba(236, 72, 153, 0.82) 100%),
+        url('images/Background%20Hero-Section.png') center / cover no-repeat;
+    }
+
+    .article-body p {
+      margin-top: 1rem;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <!-- NAV -->
+  <nav id="main-nav" class="absolute top-0 left-0 right-0 z-[130]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-32 flex items-center justify-between">
+      <a href="index.html" class="logo-link flex items-center gap-x-3">
+        <img src="Logo-Officiel.png" alt="Logo" class="h-28 lg:h-24 w-auto object-contain" />
+      </a>
+
+      <div class="hidden lg:flex items-center gap-x-3 text-base font-semibold">
+        <a href="index.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
+        </a>
+        <a href="aide-activite.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><span>Aide à l'activité</span>
+        </a>
+        <a href="article-activite.html" class="flex items-center gap-x-2 px-4 py-2 text-indigo-700 bg-indigo-50 rounded-2xl transition-colors" aria-current="page">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path><path d="M8 7h8"></path><path d="M8 11h8"></path></svg><span>Articles</span>
+        </a>
+        <a href="Jivhan.html" class="flex items-center gap-x-2 px-4 py-2 text-slate-700 hover:text-indigo-600 hover:bg-slate-100 rounded-2xl transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 4-2 4s2.74-.5 4-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22 22 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg><span>Jivhan</span>
+        </a>
+        <a href="3D.html" class="flex items-center gap-x-2 px-5 py-2 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 transition-all hover:scale-105 transform">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
+          <span>Le Musée 3D</span>
+        </a>
+      </div>
+
+      <button id="burger-btn"
+              class="lg:hidden w-10 h-10 flex items-center justify-center text-2xl text-slate-700 hover:text-indigo-600 transition-colors"
+              aria-label="Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-drawer" class="hidden lg:hidden fixed inset-0 z-[140]">
+    <div id="drawer-backdrop" class="absolute inset-0 bg-black/50 transition-opacity"></div>
+    <div id="drawer-panel"
+         class="absolute top-0 bottom-0 right-0 w-72 max-w-[80%] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col">
+      <div class="flex items-center justify-between px-5 h-16 border-b">
+        <div class="flex items-center gap-x-3">
+          <img src="Logo-Officiel.png" alt="Logo" class="h-14 w-auto object-contain" />
+          <span class="font-extrabold text-indigo-700">Menu</span>
+        </div>
+        <button id="drawer-close" class="w-9 h-9 flex items-center justify-center text-2xl text-slate-400 hover:text-slate-700">
+          &times;
+        </button>
+      </div>
+
+      <div class="flex flex-col py-2 text-lg">
+        <a href="index.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg><span>Accueil</span>
+        </a>
+        <a href="aide-activite.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><span>Aide à l'activité</span>
+        </a>
+        <a href="article-activite.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-indigo-700 bg-indigo-50 font-semibold" aria-current="page">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path><path d="M8 7h8"></path><path d="M8 11h8"></path></svg><span>Articles</span>
+        </a>
+        <a href="Jivhan.html" class="drawer-link flex items-center gap-x-3 px-6 py-3.5 text-slate-700 hover:bg-slate-100 font-medium">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 4-2 4s2.74-.5 4-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22 22 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg><span>Jivhan</span>
+        </a>
+        <div class="px-6 pt-3">
+          <a href="3D.html" class="drawer-link flex items-center justify-center gap-x-3 px-6 py-3.5 bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 rounded-2xl shadow-md shadow-indigo-600/25 font-semibold transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path></svg>
+            <span>Le Musée 3D</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-auto p-5 text-xs text-slate-400 border-t">
+        Article de l'activité
+      </div>
+    </div>
+  </div>
+
+  <header class="article-hero text-white">
+    <div class="max-w-4xl mx-auto px-6 pb-16 md:pb-20 text-center">
+      <div class="inline-flex items-center gap-x-2 bg-white/20 backdrop-blur px-4 py-1 rounded-3xl text-sm font-medium mb-5">
+        <i class="fa-regular fa-newspaper"></i>
+        Retour sur l'atelier
+      </div>
+      <h1 class="kid-title text-4xl md:text-6xl font-extrabold tracking-tighter leading-none mb-5">
+        Quand les dessins deviennent presque des jouets
+      </h1>
+      <p class="text-lg md:text-2xl text-white/95 max-w-3xl mx-auto leading-relaxed">
+        Mercredi matin, les enfants ont exploré une activité qui libère la créativité et l'imaginaire : inventer, dessiner, puis voir une idée prendre forme en 3D.
+      </p>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-14 md:py-16">
+    <article class="article-body bg-white border border-slate-100 shadow-xl rounded-3xl p-7 md:p-10">
+      <p class="text-sm font-bold uppercase tracking-wide text-indigo-600">Activité créative du mercredi matin</p>
+      <h2 class="kid-title text-3xl md:text-4xl font-extrabold text-slate-950 mt-3 mb-5">
+        Un atelier pour transformer l'imagination en volume
+      </h2>
+      <p class="text-slate-600">
+        L'activité est partie d'un geste très simple : prendre une feuille, choisir une idée, puis dessiner librement. Personnage, véhicule, animal fantastique, créature inventée ou objet magique, chaque enfant a pu poser sur le papier une petite partie de son monde intérieur.
+      </p>
+      <p class="text-slate-600">
+        Ce moment de création montre à quel point le dessin peut devenir une porte d'entrée vers autre chose. Une fois le croquis imaginé, il peut être retravaillé, mis en forme, puis transformé en modèle 3D. On ne regarde plus seulement un dessin : on découvre une création que l'on peut tourner, observer, agrandir et présenter comme une vraie pièce de musée.
+      </p>
+      <p class="text-slate-600">
+        L'idée la plus forte, c'est qu'avec une imprimante 3D, ce type de création pourrait aller encore plus loin. Le dessin pourrait devenir un objet à tenir dans les mains, presque un jouet né directement de l'imaginaire de l'enfant. Cela rend l'activité concrète, motivante et très valorisante.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-4 my-8">
+        <div class="rounded-2xl bg-indigo-50 p-5">
+          <i class="fa-solid fa-lightbulb text-indigo-600 text-xl"></i>
+          <h3 class="font-extrabold text-slate-900 mt-3">Imaginer</h3>
+          <p class="text-sm text-slate-600 mt-2">L'enfant invente une idée personnelle, drôle, fantastique ou totalement nouvelle.</p>
+        </div>
+        <div class="rounded-2xl bg-pink-50 p-5">
+          <i class="fa-solid fa-pencil text-pink-600 text-xl"></i>
+          <h3 class="font-extrabold text-slate-900 mt-3">Dessiner</h3>
+          <p class="text-sm text-slate-600 mt-2">Le dessin devient le point de départ d'une création plus grande.</p>
+        </div>
+        <div class="rounded-2xl bg-emerald-50 p-5">
+          <i class="fa-solid fa-cube text-emerald-600 text-xl"></i>
+          <h3 class="font-extrabold text-slate-900 mt-3">Voir en 3D</h3>
+          <p class="text-sm text-slate-600 mt-2">La création prend du volume et peut être explorée comme un objet.</p>
+        </div>
+      </div>
+
+      <p class="text-slate-600">
+        Au-delà de la technologie, l'atelier met surtout en avant la confiance créative. Les enfants voient que leurs idées comptent, qu'un simple dessin peut devenir une création numérique, et que l'imagination peut être une vraie matière de projet.
+      </p>
+
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a href="3D.html" class="inline-flex items-center gap-x-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/20 transition-colors">
+          <i class="fa-solid fa-cube"></i>
+          <span>Voir le musée 3D</span>
+        </a>
+        <a href="aide-activite.html" class="inline-flex items-center gap-x-2 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl transition-colors">
+          <i class="fa-regular fa-circle-question"></i>
+          <span>Comprendre l'activité</span>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white py-10 text-center">
+    <div class="max-w-3xl mx-auto px-6">
+      <img src="Logo-Footer.png" alt="Logo footer" class="h-24 md:h-32 w-auto max-w-full object-contain mx-auto mb-5 drop-shadow-md" />
+      <p class="text-lg font-extrabold text-indigo-700">Création par Julien Animateur ✨</p>
+      <p class="mt-3 text-sm text-slate-500 leading-relaxed">
+        Ce site web, développé avec soin, utilise WordPress, HTML, CSS et JavaScript pour offrir une expérience fluide et responsive, optimisée pour mobile et desktop.
+      </p>
+      <p class="mt-3 text-xs text-slate-400">
+        Julien Animateur — Animateur élémentaire / maternelle • Arc en ciel • Bruges
+      </p>
+      <div class="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-slate-400">
+        <a href="https://julien-animateur.fr/mentions-legales/" target="_blank" rel="noopener" class="hover:text-indigo-600 transition-colors">Mentions légales</a>
+        <span>•</span>
+        <a href="https://julien-animateur.fr/politique-de-confidentialite/" target="_blank" rel="noopener" class="hover:text-indigo-600 transition-colors">Politique de confidentialité</a>
+        <span>•</span>
+        <span>© 2025 Tous droits réservés</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function initMenu() {
+      const burger = document.getElementById('burger-btn');
+      const drawer = document.getElementById('mobile-drawer');
+      const panel = document.getElementById('drawer-panel');
+      const backdrop = document.getElementById('drawer-backdrop');
+      const closeBtn = document.getElementById('drawer-close');
+
+      if (!burger || !drawer || !panel) return;
+
+      function openDrawer() {
+        drawer.classList.remove('hidden');
+        drawer.classList.add('flex');
+        requestAnimationFrame(() => {
+          panel.classList.remove('translate-x-full');
+          panel.classList.add('translate-x-0');
+        });
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDrawer() {
+        panel.classList.remove('translate-x-0');
+        panel.classList.add('translate-x-full');
+        setTimeout(() => {
+          drawer.classList.remove('flex');
+          drawer.classList.add('hidden');
+          document.body.style.overflow = '';
+        }, 280);
+      }
+
+      burger.addEventListener('click', openDrawer);
+      if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+      if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+      drawer.querySelectorAll('.drawer-link').forEach(link => {
+        link.addEventListener('click', closeDrawer);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !drawer.classList.contains('hidden')) closeDrawer();
+      });
+    }
+
+    window.onload = initMenu;
+  </script>
+</body>
+</html>
